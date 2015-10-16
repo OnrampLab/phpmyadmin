@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    </head>
+    <body>
+        <h1>Permission Denied <span id="face"></span></h1>
+        <script>
+            var faceIndex = 1;
+            var faces = new Array('☺','☻');
+            var func = function(){
+                faceIndex = 1-faceIndex;
+                document.getElementById('face').innerHTML = faces[faceIndex];
+            };
+            func();
+            document.addEventListener("DOMContentLoaded", function(event) {
+                setInterval(func, 2500);
+            });
+        </script>
+    </body>
+</html>
