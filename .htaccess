@@ -2,7 +2,7 @@
 ## Allow localhost only
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /phpmyadmin
+    #RewriteBase /phpmyadmin
 
     RewriteCond %{REMOTE_HOST} !^127\.0\.0\.1
     RewriteCond %{REMOTE_HOST} !^192\.168\.
