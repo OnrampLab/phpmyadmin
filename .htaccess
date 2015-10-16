@@ -1,7 +1,5 @@
-
 ############################################
 ## Allow localhost only
-## permission-deny
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteBase /phpmyadmin
