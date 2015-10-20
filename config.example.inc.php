@@ -47,3 +47,13 @@ $cfg['PDFDefaultPageSize'] = 'A4';
 $cfg['UploadDir'] = '';
 $cfg['SaveDir'] = '';
 
+
+
+
+/*
+
+設定正式環境的背景顏色, 以提醒使用者
+vi themes/original/layout.inc.php
+    $GLOBALS['cfg']['NaviBackground'] = '#D0EEE0';
+
+*/
