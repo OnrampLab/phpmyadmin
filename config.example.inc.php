@@ -56,4 +56,7 @@ $cfg['SaveDir'] = '';
 vi themes/original/layout.inc.php
     $GLOBALS['cfg']['NaviBackground'] = '#D0EEE0';
 
+vi themes/pmahomme/layout.inc.php 
+    $GLOBALS['cfg']['NaviBackground'] = '#e3ffe3';
+
 */
