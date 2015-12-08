@@ -2,52 +2,68 @@
 
 $cfg['blowfish_secret'] = '';
 
-/* Servers configuration */
+// Servers configuration
 $i = 0;
 
 // [1] 
 $i++;
-$cfg['Servers'][$i]['auth_type'] = 'cookie';
+$cfg['Servers'][$i] = getDefaultConfig();
 $cfg['Servers'][$i]['host'] = 'localhost';
-$cfg['Servers'][$i]['connect_type'] = 'tcp';
-$cfg['Servers'][$i]['compress'] = false;
-$cfg['Servers'][$i]['AllowNoPassword'] = false;
 
-// Advanced phpMyAdmin features
-// pmadb table  -> examples/config.manyhosts.inc.php
-// import       -> sql/create_tables.sql
-$cfg['Servers'][$i]['pmadb']            = 'phpmyadmin';
-$cfg['Servers'][$i]['bookmarktable']    = 'pma__bookmark';
-$cfg['Servers'][$i]['relation']         = 'pma__relation';
-$cfg['Servers'][$i]['table_info']       = 'pma__table_info';
-$cfg['Servers'][$i]['table_coords']     = 'pma__table_coords';
-$cfg['Servers'][$i]['pdf_pages']        = 'pma__pdf_pages';
-$cfg['Servers'][$i]['column_info']      = 'pma__column_info';
-$cfg['Servers'][$i]['history']          = 'pma__history';
-$cfg['Servers'][$i]['table_uiprefs']    = 'pma__table_uiprefs';
-$cfg['Servers'][$i]['tracking']         = 'pma__tracking';
-$cfg['Servers'][$i]['userconfig']       = 'pma__userconfig';
-$cfg['Servers'][$i]['recent']           = 'pma__recent';
-$cfg['Servers'][$i]['users']            = 'pma__users';
-$cfg['Servers'][$i]['usergroups']       = 'pma__usergroups';
-$cfg['Servers'][$i]['navigationhiding'] = 'pma__navigationhiding';
-$cfg['Servers'][$i]['savedsearches']    = 'pma__savedsearches';
-$cfg['Servers'][$i]['central_columns']  = 'pma__central_columns';
-//
-$cfg['Servers'][$i]['favorite']         = 'pma__favorite';
+// [2]
+// ....
+
+
 
 
 // End of servers configuration
-$cfg['QueryHistoryDB'] = true;
-$cfg['QueryHistoryMax'] = 25;
-$cfg['BrowseMIME'] = true;
-$cfg['PDFDefaultPageSize'] = 'A4';
+$cfg['QueryHistoryDB']      = true;
+$cfg['QueryHistoryMax']     = 25;
+$cfg['BrowseMIME']          = true;
+$cfg['PDFDefaultPageSize']  = 'A4';
 
 // Directories for saving/loading files from server
-$cfg['UploadDir'] = '';
-$cfg['SaveDir'] = '';
+$cfg['UploadDir']   = '';
+$cfg['SaveDir']     = '';
 
 
+
+/**
+ *
+ */
+function getDefaultConfig()
+{
+    $pma = [];
+    $pma['host']            = '';
+    $pma['auth_type']       = 'cookie';
+    $pma['connect_type']    = 'tcp';
+    $pma['compress']        = false;
+    $pma['AllowNoPassword'] = false;
+
+    // Advanced phpMyAdmin features
+    // pmadb table  -> examples/config.manyhosts.inc.php
+    // import       -> sql/create_tables.sql
+    $pma['pmadb']            = 'phpmyadmin';
+    $pma['bookmarktable']    = 'pma__bookmark';
+    $pma['relation']         = 'pma__relation';
+    $pma['table_info']       = 'pma__table_info';
+    $pma['table_coords']     = 'pma__table_coords';
+    $pma['pdf_pages']        = 'pma__pdf_pages';
+    $pma['column_info']      = 'pma__column_info';
+    $pma['history']          = 'pma__history';
+    $pma['table_uiprefs']    = 'pma__table_uiprefs';
+    $pma['tracking']         = 'pma__tracking';
+    $pma['userconfig']       = 'pma__userconfig';
+    $pma['recent']           = 'pma__recent';
+    $pma['users']            = 'pma__users';
+    $pma['usergroups']       = 'pma__usergroups';
+    $pma['navigationhiding'] = 'pma__navigationhiding';
+    $pma['savedsearches']    = 'pma__savedsearches';
+    $pma['central_columns']  = 'pma__central_columns';
+    //
+    $pma['favorite']         = 'pma__favorite';
+    return $pam;
+}
 
 
 /*
