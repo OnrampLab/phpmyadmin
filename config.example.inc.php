@@ -8,7 +8,7 @@ $i = 0;
 // [1] 
 $i++;
 $cfg['Servers'][$i] = getDefaultConfig();
-$cfg['Servers'][$i]['host'] = 'localhost';
+$cfg['Servers'][$i]['host'] = '127.0.0.1';
 
 // [2]
 // ....
@@ -34,7 +34,7 @@ $cfg['SaveDir']     = '';
 function getDefaultConfig()
 {
     $pma = [];
-    $pma['host']            = '';
+    $pma['host']            = '127.0.0.1';
     $pma['auth_type']       = 'cookie';
     $pma['connect_type']    = 'tcp';
     $pma['compress']        = false;
