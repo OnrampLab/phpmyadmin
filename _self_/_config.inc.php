@@ -43,25 +43,27 @@ function getDefaultConfig()
     // Advanced phpMyAdmin features
     // pmadb table  -> examples/config.manyhosts.inc.php
     // import       -> sql/create_tables.sql
-    $pma['pmadb']            = 'phpmyadmin';
-    $pma['bookmarktable']    = 'pma__bookmark';
-    $pma['relation']         = 'pma__relation';
-    $pma['table_info']       = 'pma__table_info';
-    $pma['table_coords']     = 'pma__table_coords';
-    $pma['pdf_pages']        = 'pma__pdf_pages';
-    $pma['column_info']      = 'pma__column_info';
-    $pma['history']          = 'pma__history';
-    $pma['table_uiprefs']    = 'pma__table_uiprefs';
-    $pma['tracking']         = 'pma__tracking';
-    $pma['userconfig']       = 'pma__userconfig';
-    $pma['recent']           = 'pma__recent';
-    $pma['users']            = 'pma__users';
-    $pma['usergroups']       = 'pma__usergroups';
-    $pma['navigationhiding'] = 'pma__navigationhiding';
-    $pma['savedsearches']    = 'pma__savedsearches';
-    $pma['central_columns']  = 'pma__central_columns';
+    $pma['pmadb']               = 'phpmyadmin';
+    $pma['bookmarktable']       = 'pma__bookmark';
+    $pma['relation']            = 'pma__relation';
+    $pma['table_info']          = 'pma__table_info';
+    $pma['table_coords']        = 'pma__table_coords';
+    $pma['pdf_pages']           = 'pma__pdf_pages';
+    $pma['column_info']         = 'pma__column_info';
+    $pma['history']             = 'pma__history';
+    $pma['table_uiprefs']       = 'pma__table_uiprefs';
+    $pma['tracking']            = 'pma__tracking';
+    $pma['userconfig']          = 'pma__userconfig';
+    $pma['recent']              = 'pma__recent';
+    $pma['users']               = 'pma__users';
+    $pma['usergroups']          = 'pma__usergroups';
+    $pma['navigationhiding']    = 'pma__navigationhiding';
+    $pma['savedsearches']       = 'pma__savedsearches';
+    $pma['central_columns']     = 'pma__central_columns';
+    $pma['designer_settings']   = 'pma__designer_settings';
+    $pma['export_templates']    = 'pma__export_templates';
     //
-    $pma['favorite']         = 'pma__favorite';
+    $pma['favorite']            = 'pma__favorite';
     return $pam;
 }
 

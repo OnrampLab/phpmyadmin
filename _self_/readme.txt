@@ -6,7 +6,7 @@ remove
 
 install
 
-    cp config.example.inc.php config.inc.php
+    cp _self_/_config.inc.php config.inc.php
     vi config.inc.php
     chmod 644 config.inc.php
 
