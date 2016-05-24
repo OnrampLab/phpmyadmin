@@ -34,11 +34,12 @@ $cfg['SaveDir']     = '';
 function getDefaultConfig()
 {
     $pma = [];
-    $pma['host']            = '127.0.0.1';
-    $pma['auth_type']       = 'cookie';
-    $pma['connect_type']    = 'tcp';
-    $pma['compress']        = false;
-    $pma['AllowNoPassword'] = false;
+    $pma['host']                = '127.0.0.1';
+    $pma['auth_type']           = 'cookie';
+    $pma['connect_type']        = 'tcp';
+    $pma['compress']            = false;
+    $pma['AllowNoPassword']     = false;
+    $pma['LoginCookieValidity'] = 1 * 60 * 60;  // timeout 1440s = 24m
 
     // Advanced phpMyAdmin features
     // pmadb table  -> examples/config.manyhosts.inc.php
