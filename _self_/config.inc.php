@@ -1,11 +1,12 @@
 <?php
 
 $cfg['blowfish_secret'] = '';
+$cfg['ThemeDefault']    = 'original';
 
 // Servers configuration
 $i = 0;
 
-// [1] 
+// [1]
 $i++;
 $cfg['Servers'][$i] = getDefaultConfig();
 $cfg['Servers'][$i]['host'] = '127.0.0.1';
@@ -75,7 +76,7 @@ function getDefaultConfig()
 vi themes/original/layout.inc.php
     $GLOBALS['cfg']['NaviBackground'] = '#D0EEE0';
 
-vi themes/pmahomme/layout.inc.php 
+vi themes/pmahomme/layout.inc.php
     $GLOBALS['cfg']['NaviBackground'] = '#e3ffe3';
 
 */
