@@ -27,6 +27,11 @@ $cfg['PDFDefaultPageSize']  = 'A4';
 $cfg['UploadDir']   = '';
 $cfg['SaveDir']     = '';
 
+# 界面上的功能, 點擊欄位後, 變成 input 框, 可以修改內容, 立即變更
+# 如果不想使用, 可以將值改為 "disabled"
+# $cfg['GridEditing'] = 'click';          //single-click editing
+# $cfg['GridEditing'] = 'double-click';   //default value. No need to specify this except for maybe readability purposes
+# $cfg['GridEditing'] = 'disabled';       //disabled cell/grid editing completely
 
 
 /**
