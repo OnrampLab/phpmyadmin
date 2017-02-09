@@ -15,10 +15,12 @@ setting
     vi .htaccess
 
 安裝須知
+
     - 要啟動 mod rewrite
         - a2enmod rewrite
     - php install extend
         - sudo apt-get install -y php-mbstring
-    - 如果有還有問題可以查看 tail -f /var/log/apache2/error.log 
-
+    - 如果無法正常啓用 或 出現 HTTP ERROR 500 可以査看 error log
+    - error log
+        tail -f /var/log/apache2/error.log
 
