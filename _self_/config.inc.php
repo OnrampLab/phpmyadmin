@@ -49,7 +49,6 @@ function getDefaultConfig()
 
     // Advanced phpMyAdmin features
     // pmadb table  -> examples/config.manyhosts.inc.php
-    // import       -> sql/create_tables.sql
     $pma['pmadb']               = 'phpmyadmin';
     $pma['bookmarktable']       = 'pma__bookmark';
     $pma['relation']            = 'pma__relation';
