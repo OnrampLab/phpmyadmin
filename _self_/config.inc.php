@@ -62,6 +62,7 @@ function getDefaultConfig()
     $pma['tracking']            = 'pma__tracking';
     $pma['userconfig']          = 'pma__userconfig';
     $pma['recent']              = 'pma__recent';
+    $pma['favorite']            = 'pma__favorite';
     $pma['users']               = 'pma__users';
     $pma['usergroups']          = 'pma__usergroups';
     $pma['navigationhiding']    = 'pma__navigationhiding';
@@ -69,8 +70,6 @@ function getDefaultConfig()
     $pma['central_columns']     = 'pma__central_columns';
     $pma['designer_settings']   = 'pma__designer_settings';
     $pma['export_templates']    = 'pma__export_templates';
-    //
-    $pma['favorite']            = 'pma__favorite';
     return $pam;
 }
 
