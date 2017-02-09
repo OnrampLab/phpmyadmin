@@ -206,13 +206,10 @@ function PMA_securePath($path)
  *
  * @param string       $error_message  the error message or named error message
  * @param string|array $message_args   arguments applied to $error_message
- * @param boolean      $delete_session whether to delete session cookie
  *
  * @return void
  */
-function PMA_fatalError(
-    $error_message, $message_args = null, $delete_session = true
-) {
+function PMA_fatalError($error_message, $message_args = null) {
     /* Use format string if applicable */
     if (is_string($message_args)) {
         $error_message = sprintf($error_message, $message_args);
@@ -248,14 +245,6 @@ function PMA_fatalError(
         }
         $lang = isset($GLOBALS['lang']) ? $GLOBALS['lang'] : 'en';
         $dir = isset($GLOBALS['text_dir']) ? $GLOBALS['text_dir'] : 'ltr';
-
-        // on fatal errors it cannot hurt to always delete the current session
-        if ($delete_session
-            && isset($GLOBALS['session_name'])
-            && isset($_COOKIE[$GLOBALS['session_name']])
-        ) {
-            $GLOBALS['PMA_Config']->removeCookie($GLOBALS['session_name']);
-        }
 
         // Displays the error message
         include './libraries/error.inc.php';
@@ -356,7 +345,7 @@ function PMA_getTableCount($db)
 
 /**
  * Converts numbers like 10M into bytes
- * Used with permission from Moodle (http://moodle.org) by Martin Dougiamas
+ * Used with permission from Moodle (https://moodle.org) by Martin Dougiamas
  * (renamed with PMA prefix to avoid double definition when embedded
  * in Moodle)
  *
@@ -503,28 +492,13 @@ function PMA_sendHeaderLocation($uri, $use_refresh = false)
      * like /phpmyadmin/index.php/ which some web servers happily accept.
      */
     if ($uri[0] == '.') {
-        $uri = $GLOBALS['PMA_Config']->getCookiePath() . substr($uri, 2);
+        $uri = $GLOBALS['PMA_Config']->getRootPath() . substr($uri, 2);
     }
 
     $response = PMA\libraries\Response::getInstance();
 
-    if (SID) {
-        if (mb_strpos($uri, '?') === false) {
-            $response->header('Location: ' . $uri . '?' . SID);
-        } else {
-            $separator = PMA_URL_getArgSeparator();
-            $response->header('Location: ' . $uri . $separator . SID);
-        }
-        return;
-    }
-
     session_write_close();
     if ($response->headersSent()) {
-        if (function_exists('debug_print_backtrace')) {
-            echo '<pre>';
-            debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-            echo '</pre>';
-        }
         trigger_error(
             'PMA_sendHeaderLocation called when headers are already sent!',
             E_USER_ERROR
@@ -571,7 +545,7 @@ function PMA_noCacheHeader()
         return;
     }
     // rfc2616 - Section 14.21
-    header('Expires: ' . date(DATE_RFC1123));
+    header('Expires: ' . gmdate(DATE_RFC1123));
     // HTTP/1.1
     header(
         'Cache-Control: no-store, no-cache, must-revalidate,'
@@ -594,7 +568,7 @@ function PMA_noCacheHeader()
     // test case: exporting a database into a .gz file with Safari
     // would produce files not having the current time
     // (added this header for Safari but should not harm other browsers)
-    header('Last-Modified: ' . date(DATE_RFC1123));
+    header('Last-Modified: ' . gmdate(DATE_RFC1123));
 }
 
 
@@ -769,12 +743,25 @@ function PMA_linkURL($url)
 function PMA_isAllowedDomain($url)
 {
     $arr = parse_url($url);
+    // We need host to be set
+    if (! isset($arr['host']) || strlen($arr['host']) == 0) {
+        return false;
+    }
+    // We do not want these to be present
+    $blocked = array('user', 'pass', 'port');
+    foreach ($blocked as $part) {
+        if (isset($arr[$part]) && strlen($arr[$part]) != 0) {
+            return false;
+        }
+    }
     $domain = $arr["host"];
     $domainWhiteList = array(
         /* Include current domain */
         $_SERVER['SERVER_NAME'],
         /* phpMyAdmin domains */
-        'wiki.phpmyadmin.net', 'www.phpmyadmin.net', 'phpmyadmin.net',
+        'wiki.phpmyadmin.net',
+        'www.phpmyadmin.net',
+        'phpmyadmin.net',
         'demo.phpmyadmin.net',
         'docs.phpmyadmin.net',
         /* mysql.com domains */
@@ -792,7 +779,7 @@ function PMA_isAllowedDomain($url)
         /* Following are doubtful ones. */
         'mysqldatabaseadministration.blogspot.com',
     );
-    if (in_array(mb_strtolower($domain), $domainWhiteList)) {
+    if (in_array($domain, $domainWhiteList)) {
         return true;
     }
 
@@ -948,6 +935,10 @@ function PMA_cleanupPathInfo()
     }
     $_PATH_INFO = PMA_getenv('PATH_INFO');
     if (! empty($_PATH_INFO) && ! empty($PMA_PHP_SELF)) {
+        $question_pos = mb_strpos($PMA_PHP_SELF, '?');
+        if ($question_pos != false) {
+            $PMA_PHP_SELF = mb_substr($PMA_PHP_SELF, 0, $question_pos);
+        }
         $path_info_pos = mb_strrpos($PMA_PHP_SELF, $_PATH_INFO);
         if ($path_info_pos !== false) {
             $path_info_part = mb_substr($PMA_PHP_SELF, $path_info_pos, mb_strlen($_PATH_INFO));
@@ -956,7 +947,24 @@ function PMA_cleanupPathInfo()
             }
         }
     }
-    $PMA_PHP_SELF = htmlspecialchars($PMA_PHP_SELF);
+
+    $path = [];
+    foreach(explode('/', $PMA_PHP_SELF) as $part) {
+        // ignore parts that have no value
+        if (empty($part) || $part === '.') continue;
+
+        if ($part !== '..') {
+            // cool, we found a new part
+            array_push($path, $part);
+        } else if (count($path) > 0) {
+            // going back up? sure
+            array_pop($path);
+        }
+        // Here we intentionall ignore case where we go too up
+        // as there is nothing sane to do
+    }
+
+    $PMA_PHP_SELF = htmlspecialchars('/' . join('/', $path));
 }
 
 /**
@@ -994,4 +1002,154 @@ if(! function_exists('hash_equals')) {
         $ret |= array_sum(unpack("C*", $a ^ $b));
         return ! $ret;
     }
+}
+/* Compatibility with PHP < 5.1 or PHP without hash extension */
+if (! function_exists('hash_hmac')) {
+    function hash_hmac($algo, $data, $key, $raw_output = false)
+    {
+        $algo = strtolower($algo);
+        $pack = 'H'.strlen($algo('test'));
+        $size = 64;
+        $opad = str_repeat(chr(0x5C), $size);
+        $ipad = str_repeat(chr(0x36), $size);
+
+        if (strlen($key) > $size) {
+            $key = str_pad(pack($pack, $algo($key)), $size, chr(0x00));
+        } else {
+            $key = str_pad($key, $size, chr(0x00));
+        }
+
+        for ($i = 0; $i < strlen($key) - 1; $i++) {
+            $opad[$i] = $opad[$i] ^ $key[$i];
+            $ipad[$i] = $ipad[$i] ^ $key[$i];
+        }
+
+        $output = $algo($opad.pack($pack, $algo($ipad.$data)));
+
+        return ($raw_output) ? pack($pack, $output) : $output;
+    }
+}
+
+/**
+ * Sanitizes MySQL hostname
+ *
+ * * strips p: prefix(es)
+ *
+ * @param string $name User given hostname
+ *
+ * @return string
+ */
+function PMA_sanitizeMySQLHost($name)
+{
+    while (strtolower(substr($name, 0, 2)) == 'p:') {
+        $name = substr($name, 2);
+    }
+
+    return $name;
+}
+
+/**
+ * Sanitizes MySQL username
+ *
+ * * strips part behind null byte
+ *
+ * @param string $name User given username
+ *
+ * @return string
+ */
+function PMA_sanitizeMySQLUser($name)
+{
+    $position = strpos($name, chr(0));
+    if ($position !== false) {
+        return substr($name, 0, $position);
+    }
+    return $name;
+}
+
+/**
+ * Safe unserializer wrapper
+ *
+ * It does not unserialize data containing objects
+ *
+ * @param string $data Data to unserialize
+ *
+ * @return mixed
+ */
+function PMA_safeUnserialize($data)
+{
+    if (! is_string($data)) {
+        return null;
+    }
+
+    /* validate serialized data */
+    $length = strlen($data);
+    $depth = 0;
+    for ($i = 0; $i < $length; $i++) {
+        $value = $data[$i];
+
+        switch ($value)
+        {
+            case '}':
+                /* end of array */
+                if ($depth <= 0) {
+                    return null;
+                }
+                $depth--;
+                break;
+            case 's':
+                /* string */
+                // parse sting length
+                $strlen = intval(substr($data, $i + 2));
+                // string start
+                $i = strpos($data, ':', $i + 2);
+                if ($i === false) {
+                    return null;
+                }
+                // skip string, quotes and ;
+                $i += 2 + $strlen + 1;
+                if ($data[$i] != ';') {
+                    return null;
+                }
+                break;
+
+            case 'b':
+            case 'i':
+            case 'd':
+                /* bool, integer or double */
+                // skip value to sepearator
+                $i = strpos($data, ';', $i);
+                if ($i === false) {
+                    return null;
+                }
+                break;
+            case 'a':
+                /* array */
+                // find array start
+                $i = strpos($data, '{', $i);
+                if ($i === false) {
+                    return null;
+                }
+                // remember nesting
+                $depth++;
+                break;
+            case 'N':
+                /* null */
+                // skip to end
+                $i = strpos($data, ';', $i);
+                if ($i === false) {
+                    return null;
+                }
+                break;
+            default:
+                /* any other elements are not wanted */
+                return null;
+        }
+    }
+
+    // check unterminated arrays
+    if ($depth > 0) {
+        return null;
+    }
+
+    return unserialize($data);
 }

@@ -979,10 +979,10 @@ class DisplayResultsTest extends PMATestCase
                     'routine_type' => 'FUNCTION'
                 ),
                 'routine_name',
-                'db_routines.php?item_name=circumference&amp;db=data'
-                . '&amp;item_type=FUNCTION&amp;server=0&amp;lang=en'
-                . '&amp;collation_connection=utf-8'
-                . '&amp;token=token'
+                'db_routines.php?item_name=circumference&db=data'
+                . '&item_type=FUNCTION&server=0&lang=en'
+                . '&collation_connection=utf-8'
+                . '&token=token'
             ),
             array(
                 'information_schema',
@@ -994,10 +994,10 @@ class DisplayResultsTest extends PMATestCase
                     'routine_type' => 'PROCEDURE'
                 ),
                 'routine_name',
-                'db_routines.php?item_name=area&amp;db=data'
-                . '&amp;item_type=PROCEDURE&amp;server=0&amp;lang=en'
-                . '&amp;collation_connection=utf-8'
-                . '&amp;token=token'
+                'db_routines.php?item_name=area&db=data'
+                . '&item_type=PROCEDURE&server=0&lang=en'
+                . '&collation_connection=utf-8'
+                . '&token=token'
             ),
             array(
                 'information_schema',
@@ -1009,10 +1009,10 @@ class DisplayResultsTest extends PMATestCase
                 ),
                 'column_name',
                 'index.php?sql_query=SELECT+%60CHARACTER_SET_NAME%60+FROM+%60info'
-                . 'rmation_schema%60.%60CHARACTER_SETS%60&amp;db=information_schema'
-                . '&amp;test_name=value&amp;server=0&amp;lang=en'
-                . '&amp;collation_connection=utf-8'
-                . '&amp;token=token'
+                . 'rmation_schema%60.%60CHARACTER_SETS%60&db=information_schema'
+                . '&test_name=value&server=0&lang=en'
+                . '&collation_connection=utf-8'
+                . '&token=token'
             )
         );
     }
@@ -1385,7 +1385,7 @@ class DisplayResultsTest extends PMATestCase
                 $meta,
                 $url_params,
                 null,
-                '<a href="1001" title="" target="_new">1001</a>'
+                '1001'
             ),
             array(
                 false,
@@ -1487,7 +1487,7 @@ class DisplayResultsTest extends PMATestCase
                 false,
                 'PMA_mimeDefaultFunction',
                 'PMA_mimeDefaultFunction',
-                array('http://www.github.com/'),
+                array('https://www.example.com/'),
                 false,
                 array(),
                 0,
@@ -1514,7 +1514,7 @@ class DisplayResultsTest extends PMATestCase
                 0,
                 'binary',
                 '<td class="left grid_edit  transformed hex">'
-                . '<a href="1001" title="" target="_new">1001</a></td>'
+                . '1001</td>'
             ),
             array(
                 'noblob',

@@ -400,7 +400,7 @@ function PMA_getHtmlForReplicationChangeMaster($submitname)
     $html .= '  <legend>' . __('Slave configuration');
     $html .= ' - ' . __('Change or reconfigure master server') . '</legend>';
     $html .= __(
-        'Make sure, you have unique server-id in your configuration file (my.cnf). '
+        'Make sure you have a unique server-id in your configuration file (my.cnf). '
         . 'If not, please add the following line into [mysqld] section:'
     );
     $html .= '<br />';
@@ -548,7 +548,7 @@ function PMA_getHtmlForReplicationStatusTable($type, $hidden = false, $title = t
     foreach (${"{$type}_variables"} as $variable) {
         $html .= '   <tr class="' . ($odd_row ? 'odd' : 'even') . '">';
         $html .= '     <td class="name">';
-        $html .=        $variable;
+        $html .= htmlspecialchars($variable);
         $html .= '     </td>';
         $html .= '     <td class="value">';
 
@@ -571,13 +571,13 @@ function PMA_getHtmlForReplicationStatusTable($type, $hidden = false, $title = t
             'Replicate_Do_Table', 'Replicate_Ignore_Table',
             'Replicate_Wild_Do_Table', 'Replicate_Wild_Ignore_Table');
         if (in_array($variable, $variables_wrap)) {
-            $html .= str_replace(
+            $html .= htmlspecialchars(str_replace(
                 ',',
                 ', ',
                 ${"server_{$type}_replication"}[0][$variable]
-            );
+            ));
         } else {
-            $html .= ${"server_{$type}_replication"}[0][$variable];
+            $html .= htmlspecialchars(${"server_{$type}_replication"}[0][$variable]);
         }
         $html .= '</span>';
 
@@ -806,7 +806,7 @@ function PMA_getHtmlForAddUserLoginForm($username_length)
         . (empty($_REQUEST['username']) ? '' : ' value="'
         . (isset($GLOBALS['new_username'])
             ? $GLOBALS['new_username']
-            : $_REQUEST['username']) . '"')
+            : htmlspecialchars($_REQUEST['username'])) . '"')
         . ' />'
         . '</div>';
 
@@ -836,7 +836,7 @@ function PMA_getHtmlForTableInfoForm($hostname_length)
         . '</span>'
         . '<input type="text" name="hostname" id="pma_hostname" maxlength="'
         . $hostname_length . '" value="'
-        . (isset($_REQUEST['hostname']) ? $_REQUEST['hostname'] : '')
+        . (isset($_REQUEST['hostname']) ? htmlspecialchars($_REQUEST['hostname']) : '')
         . '" title="' . __('Host')
         . '" />'
         . PMA\libraries\Util::showHint(
@@ -906,7 +906,10 @@ function PMA_handleControlRequest()
         $messageSuccess = null;
         $messageError = null;
 
-        if (isset($_REQUEST['slave_changemaster'])) {
+        if (isset($_REQUEST['slave_changemaster']) && ! $GLOBALS['cfg']['AllowArbitraryServer']) {
+            $_SESSION['replication']['sr_action_status'] = 'error';
+            $_SESSION['replication']['sr_action_info'] = __('Connection to server is disabled, please enable $cfg[\'AllowArbitraryServer\'] in phpMyAdmin configuration.');
+        } elseif (isset($_REQUEST['slave_changemaster'])) {
             $result = PMA_handleRequestForSlaveChangeMaster();
         } elseif (isset($_REQUEST['sr_slave_server_control'])) {
             $result = PMA_handleRequestForSlaveServerControl();
@@ -963,13 +966,13 @@ function PMA_handleRequestForSlaveChangeMaster()
 {
     $sr = array();
     $_SESSION['replication']['m_username'] = $sr['username']
-        = PMA\libraries\Util::sqlAddSlashes($_REQUEST['username']);
+        = $GLOBALS['dbi']->escapeString($_REQUEST['username']);
     $_SESSION['replication']['m_password'] = $sr['pma_pw']
-        = PMA\libraries\Util::sqlAddSlashes($_REQUEST['pma_pw']);
+        = $GLOBALS['dbi']->escapeString($_REQUEST['pma_pw']);
     $_SESSION['replication']['m_hostname'] = $sr['hostname']
-        = PMA\libraries\Util::sqlAddSlashes($_REQUEST['hostname']);
+        = $GLOBALS['dbi']->escapeString($_REQUEST['hostname']);
     $_SESSION['replication']['m_port']     = $sr['port']
-        = PMA\libraries\Util::sqlAddSlashes($_REQUEST['text_port']);
+        = $GLOBALS['dbi']->escapeString($_REQUEST['text_port']);
     $_SESSION['replication']['m_correct']  = '';
     $_SESSION['replication']['sr_action_status'] = 'error';
     $_SESSION['replication']['sr_action_info'] = __('Unknown error');

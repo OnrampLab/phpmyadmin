@@ -85,7 +85,7 @@ class Util
              $pow = gmp_strval(gmp_pow($base, $exp));
             break;
         case 'pow' :
-            $base = (float) $base;
+            $base = $base;
             $exp = (int) $exp;
             $pow = pow($base, $exp);
             break;
@@ -284,50 +284,6 @@ class Util
         return '<input type="hidden" name="MAX_FILE_SIZE" value="'
             . $max_size . '" />';
     }
-
-    /**
-     * Add slashes before "'" and "\" characters so a value containing them can
-     * be used in a sql comparison.
-     *
-     * @param string $a_string the string to slash
-     * @param bool   $is_like  whether the string will be used in a 'LIKE' clause
-     *                         (it then requires two more escaped sequences) or not
-     * @param bool   $crlf     whether to treat cr/lfs as escape-worthy entities
-     *                         (converts \n to \\n, \r to \\r)
-     * @param bool   $php_code whether this function is used as part of the
-     *                         "Create PHP code" dialog
-     *
-     * @return string   the slashed string
-     *
-     * @access  public
-     */
-    public static function sqlAddSlashes(
-        $a_string = '',
-        $is_like = false,
-        $crlf = false,
-        $php_code = false
-    ) {
-        if ($is_like) {
-            $a_string = str_replace('\\', '\\\\\\\\', $a_string);
-        } else {
-            $a_string = str_replace('\\', '\\\\', $a_string);
-        }
-
-        if ($crlf) {
-            $a_string = strtr(
-                $a_string,
-                array("\n" => '\n', "\r" => '\r', "\t" => '\t')
-            );
-        }
-
-        if ($php_code) {
-            $a_string = str_replace('\'', '\\\'', $a_string);
-        } else {
-            $a_string = str_replace('\'', '\\\'', $a_string);
-        }
-
-        return $a_string;
-    } // end of the 'sqlAddSlashes()' function
 
     /**
      * Add slashes before "_" and "%" characters for using them in MySQL
@@ -1167,7 +1123,9 @@ class Util
             }
 
             if (! empty($GLOBALS['show_as_php'])) {
-                $query_base = '$sql  = "' . $query_base;
+                $query_base = '$sql  = \'' . $query_base;
+                $query_base = '<code class="php"><pre>' . "\n"
+                    . $query_base;
             } elseif (isset($query_base)) {
                 $query_base = self::formatSql($query_base);
             }
@@ -1238,7 +1196,9 @@ class Util
 
             // even if the query is big and was truncated, offer the chance
             // to edit it (unless it's enormous, see linkOrButton() )
-            if (! empty($cfg['SQLQuery']['Edit'])) {
+            if (! empty($cfg['SQLQuery']['Edit'])
+                && empty($GLOBALS['show_as_php'])
+            ) {
                 $edit_link .= PMA_URL_getCommon($url_params) . '#querybox';
                 $edit_link = ' ['
                     . self::linkOrButton($edit_link, __('Edit'))
@@ -1311,7 +1271,8 @@ class Util
 
             //Clean up the end of the PHP
             if (! empty($GLOBALS['show_as_php'])) {
-                $retval .= '";';
+                $retval .= '\';' . "\n"
+                    . '</pre></code>';
             }
             $retval .= '</div>';
 
@@ -1337,7 +1298,10 @@ class Util
             /**
              * TODO: Should we have $cfg['SQLQuery']['InlineEdit']?
              */
-            if (! empty($cfg['SQLQuery']['Edit']) && ! $query_too_big) {
+            if (! empty($cfg['SQLQuery']['Edit'])
+                && ! $query_too_big
+                && empty($GLOBALS['show_as_php'])
+            ) {
                 $inline_edit_link = ' ['
                     . self::linkOrButton(
                         '#',
@@ -1461,8 +1425,7 @@ class Util
         $unit = $byteUnits[0];
 
         for ($d = 6, $ex = 15; $d >= 1; $d--, $ex-=3) {
-            // cast to float to avoid overflow
-            $unitSize = (float) $li * self::pow(10, $ex);
+            $unitSize = $li * self::pow(10, $ex);
             if (isset($byteUnits[$d]) && $value >= $unitSize) {
                 // use 1024.0 to avoid integer overflow on 64-bit machines
                 $value = round($value / (self::pow(1024, $d) / $dh)) /$dh;
@@ -1605,17 +1568,13 @@ class Util
         $value = round($value / (self::pow(1000, $d, 'pow') / $dh)) /$dh;
         $unit = $units[$d];
 
-        // If we don't want any zeros after the comma just add the thousand separator
-        if ($noTrailingZero) {
-            $localizedValue = self::localizeNumber(
-                preg_replace('/(?<=\d)(?=(\d{3})+(?!\d))/', ',', $value)
-            );
-        } else {
-            //number_format is not multibyte safe, str_replace is safe
-            $localizedValue = self::localizeNumber(
-                number_format($value, $digits_right)
-            );
+        // number_format is not multibyte safe, str_replace is safe
+        $formattedValue = number_format($value, $digits_right);
+        // If we don't want any zeros, remove them now
+        if ($noTrailingZero && strpos($formattedValue, '.') !== false) {
+            $formattedValue = preg_replace('/\.?0+$/', '', $formattedValue);
         }
+        $localizedValue = self::localizeNumber($formattedValue);
 
         if ($originalValue != 0 && floatval($value) == 0) {
             return ' <' . self::localizeNumber((1 / self::pow(10, $digits_right)))
@@ -1917,6 +1876,9 @@ class Util
         }
         if (! empty($target)) {
             $tag_params['target'] = htmlentities($target);
+            if ($target === '_blank' && strncmp($url, 'url.php?', 8) == 0) {
+                $tag_params['rel'] = 'noopener noreferrer';
+            }
         }
 
         $displayed_message = '';
@@ -2195,7 +2157,7 @@ class Util
             }
         }
         if ($found_error) {
-            PMA_fatalError($error_message, null, false);
+            PMA_fatalError($error_message);
         }
     } // end function
 
@@ -2335,7 +2297,7 @@ class Util
                         . self::printableBitValue($row[$i], $meta->length) . "'";
                 } else {
                     $con_val = '= \''
-                        . self::sqlAddSlashes($row[$i], false, true) . '\'';
+                        . $GLOBALS['dbi']->escapeString($row[$i]) . '\'';
                 }
             }
 
@@ -2692,7 +2654,7 @@ class Util
             $dir .= '/';
         }
 
-        return str_replace('%u', $GLOBALS['cfg']['Server']['user'], $dir);
+        return str_replace('%u', PMA_securePath($GLOBALS['cfg']['Server']['user']), $dir);
     }
 
     /**
@@ -3003,6 +2965,20 @@ class Util
     }
 
     /**
+     * Calculates session cache key
+     *
+     * @return string
+     */
+    public static function cacheKey()
+    {
+        if (isset($GLOBALS['cfg']['Server']['user'])) {
+            return 'server_' . $GLOBALS['server'] . '_' . $GLOBALS['cfg']['Server']['user'];
+        } else {
+            return 'server_' . $GLOBALS['server'];
+        }
+    }
+
+    /**
      * Verifies if something is cached in the session
      *
      * @param string $var variable name
@@ -3011,7 +2987,7 @@ class Util
      */
     public static function cacheExists($var)
     {
-        return isset($_SESSION['cache']['server_' . $GLOBALS['server']][$var]);
+        return isset($_SESSION['cache'][self::cacheKey()][$var]);
     }
 
     /**
@@ -3025,7 +3001,7 @@ class Util
     public static function cacheGet($var, $callback = null)
     {
         if (self::cacheExists($var)) {
-            return $_SESSION['cache']['server_' . $GLOBALS['server']][$var];
+            return $_SESSION['cache'][self::cacheKey()][$var];
         } else {
             if ($callback) {
                 $val = $callback();
@@ -3046,7 +3022,7 @@ class Util
      */
     public static function cacheSet($var, $val = null)
     {
-        $_SESSION['cache']['server_' . $GLOBALS['server']][$var] = $val;
+        $_SESSION['cache'][self::cacheKey()][$var] = $val;
     }
 
     /**
@@ -3058,7 +3034,7 @@ class Util
      */
     public static function cacheUnset($var)
     {
-        unset($_SESSION['cache']['server_' . $GLOBALS['server']][$var]);
+        unset($_SESSION['cache'][self::cacheKey()][$var]);
     }
 
     /**
@@ -4050,7 +4026,7 @@ class Util
      * @return string   An HTML snippet of a dropdown list with function
      *                    names appropriate for the requested column.
      */
-    public static function getFunctionsForField($field, $insert_mode)
+    public static function getFunctionsForField($field, $insert_mode, $foreignData)
     {
         $default_function = self::getDefaultFunctionForField($field, $insert_mode);
         $dropdown_built = array();
@@ -4062,7 +4038,7 @@ class Util
         $functions = $GLOBALS['PMA_Types']->getFunctions($field['True_Type']);
         foreach ($functions as $function) {
             $retval .= '<option';
-            if ($default_function === $function) {
+            if (isset($foreignData['foreign_link']) && $foreignData['foreign_link'] !== false && $default_function === $function) {
                 $retval .= ' selected="selected"';
             }
             $retval .= '>' . $function . '</option>' . "\n";
@@ -4159,7 +4135,7 @@ class Util
                     'SCHEMA_PRIVILEGES',
                     $username,
                     $priv,
-                    self::sqlAddSlashes($db)
+                    $GLOBALS['dbi']->escapeString($db)
                 )
             );
             if ($schema_privileges) {
@@ -4182,8 +4158,8 @@ class Util
                     'TABLE_PRIVILEGES',
                     $username,
                     $priv,
-                    self::sqlAddSlashes($db),
-                    self::sqlAddSlashes($tbl)
+                    $GLOBALS['dbi']->escapeString($db),
+                    $GLOBALS['dbi']->escapeString($tbl)
                 )
             );
             if ($table_privileges) {
@@ -4552,19 +4528,11 @@ class Util
      */
     public static function getCollateForIS()
     {
-        $lowerCaseTableNames = self::cacheGet(
-            'lower_case_table_names',
-            function () {
-                return $GLOBALS['dbi']->fetchValue(
-                    "SELECT @@lower_case_table_names"
-                );
-            }
-        );
-
-        if ($lowerCaseTableNames === '0' // issue #10961
-            || $lowerCaseTableNames === '2' // issue #11461
-        ) {
+        $names = $GLOBALS['dbi']->getLowerCaseNames();
+        if ($names === '0') {
             return "COLLATE utf8_bin";
+        } elseif ($names === '2') {
+            return "COLLATE utf8_general_ci";
         }
         return "";
     }
@@ -4670,7 +4638,7 @@ class Util
             ->render(
                 array(
                     'pos' => $pos,
-                    'unlim_num_rows' => $_REQUEST['unlim_num_rows'],
+                    'unlim_num_rows' => intval($_REQUEST['unlim_num_rows']),
                     'rows' => $rows,
                     'sql_query' => $sql_query,
                 )
@@ -4940,7 +4908,7 @@ class Util
                     if (! isset($sot_cache[$tmp[0]])) {
                         $sts_result = $GLOBALS['dbi']->query(
                             "SHOW TABLE STATUS FROM " . Util::backquote($db)
-                            . " LIKE '" . Util::sqlAddSlashes($tmp[0], true)
+                            . " LIKE '" . $GLOBALS['dbi']->escapeString($tmp[0])
                             . "';"
                         );
                         $sts_tmp = $GLOBALS['dbi']->fetchAssoc($sts_result);

@@ -416,7 +416,9 @@ class ConfigFile
         $dsn = 'mysqli://';
         if ($this->getValue("$path/auth_type") == 'config') {
             $dsn .= $this->getValue("$path/user");
-            if (! $this->getValue("$path/nopassword")) {
+            if (! $this->getValue("$path/nopassword")
+                || ! empty($this->getValue("$path/password"))
+            ) {
                 $dsn .= ':***';
             }
             $dsn .= '@';
@@ -478,16 +480,6 @@ class ConfigFile
         ) {
             unset($_SESSION[$this->_id]['ServerDefault']);
         }
-    }
-
-    /**
-     * Returns config file path, relative to phpMyAdmin's root path
-     *
-     * @return string
-     */
-    public function getFilePath()
-    {
-        return SETUP_CONFIG_FILE;
     }
 
     /**

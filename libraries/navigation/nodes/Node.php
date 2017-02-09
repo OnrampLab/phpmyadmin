@@ -424,7 +424,9 @@ class Node
             return $retval;
         }
 
-        $dbSeparator = $GLOBALS['cfg']['NavigationTreeDbSeparator'];
+        $dbSeparator = $GLOBALS['dbi']->escapeString(
+            $GLOBALS['cfg']['NavigationTreeDbSeparator']
+        );
         if (isset($GLOBALS['cfg']['Server']['DisableIS'])
             && !$GLOBALS['cfg']['Server']['DisableIS']
         ) {
@@ -434,7 +436,7 @@ class Node
             $query .= "SELECT DB_first_level ";
             $query .= "FROM ( ";
             $query .= "SELECT DISTINCT SUBSTRING_INDEX(SCHEMA_NAME, ";
-            $query .= "'$dbSeparator', 1) ";
+            $query .= "'%s', 1) ";
             $query .= "DB_first_level ";
             $query .= "FROM INFORMATION_SCHEMA.SCHEMATA ";
             $query .= $this->_getWhereClause('SCHEMA_NAME', $searchClause);
@@ -444,11 +446,19 @@ class Node
             $query .= ") t2 ";
             $query .= $this->_getWhereClause('SCHEMA_NAME', $searchClause);
             $query .= "AND 1 = LOCATE(CONCAT(DB_first_level, ";
-            $query .= "'$dbSeparator'), ";
+            $query .= "'%s'), ";
             $query .= "CONCAT(SCHEMA_NAME, ";
-            $query .= "'$dbSeparator')) ";
+            $query .= "'%s')) ";
             $query .= "ORDER BY SCHEMA_NAME ASC";
-            $retval = $GLOBALS['dbi']->fetchResult($query);
+
+            $retval = $GLOBALS['dbi']->fetchResult(
+                sprintf(
+                    $query,
+                    $dbSeparator,
+                    $dbSeparator,
+                    $dbSeparator
+                )
+            );
 
             return $retval;
         }
@@ -480,7 +490,7 @@ class Node
             $subClauses = array();
             foreach ($prefixes as $prefix) {
                 $subClauses[] = " LOCATE('"
-                    . Util::sqlAddSlashes($prefix) . $dbSeparator
+                    . $GLOBALS['dbi']->escapeString($prefix) . $dbSeparator
                     . "', "
                     . "CONCAT(`Database`, '" . $dbSeparator . "')) = 1 ";
             }
@@ -685,7 +695,7 @@ class Node
     {
         if (!empty($searchClause)) {
             $databases = array(
-                "%" . Util::sqlAddSlashes($searchClause, true) . "%",
+                "%" . $GLOBALS['dbi']->escapeString($searchClause) . "%",
             );
         } elseif (!empty($GLOBALS['cfg']['Server']['only_db'])) {
             $databases = $GLOBALS['cfg']['Server']['only_db'];
@@ -712,16 +722,15 @@ class Node
         if (!empty($searchClause)) {
             $whereClause .= "AND " . Util::backquote($columnName)
                 . " LIKE '%";
-            $whereClause .= Util::sqlAddSlashes(
-                $searchClause,
-                true
-            );
+            $whereClause .= $GLOBALS['dbi']->escapeString($searchClause);
             $whereClause .= "%' ";
         }
 
         if (!empty($GLOBALS['cfg']['Server']['hide_db'])) {
             $whereClause .= "AND " . Util::backquote($columnName)
-                . " NOT REGEXP '" . $GLOBALS['cfg']['Server']['hide_db'] . "' ";
+                . " NOT REGEXP '"
+                . $GLOBALS['dbi']->escapeString($GLOBALS['cfg']['Server']['hide_db'])
+                . "' ";
         }
 
         if (!empty($GLOBALS['cfg']['Server']['only_db'])) {
@@ -735,7 +744,7 @@ class Node
             foreach ($GLOBALS['cfg']['Server']['only_db'] as $each_only_db) {
                 $subClauses[] = " " . Util::backquote($columnName)
                     . " LIKE '"
-                    . $each_only_db . "' ";
+                    . $GLOBALS['dbi']->escapeString($each_only_db) . "' ";
             }
             $whereClause .= implode("OR", $subClauses) . ") ";
         }
@@ -815,7 +824,7 @@ class Node
                 );
             $sqlQuery = "SELECT `db_name`, COUNT(*) AS `count` FROM " . $navTable
                 . " WHERE `username`='"
-                . Util::sqlAddSlashes(
+                . $GLOBALS['dbi']->escapeString(
                     $GLOBALS['cfg']['Server']['user']
                 ) . "'"
                 . " GROUP BY `db_name`";

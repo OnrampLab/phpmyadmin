@@ -529,6 +529,26 @@ class ConfigFileTest extends PMATestCase
             "mysqli://testUser@123",
             $this->object->getServerDSN(1)
         );
+
+        $this->object->updateWithGlobalConfig(
+            array(
+                'Servers' => array(
+                    1 => array(
+                        "auth_type" => "config",
+                        "user" => "testUser",
+                        "connect_type" => "tcp",
+                        "host" => "example.com",
+                        "port" => "21",
+                        "nopassword" => "yes",
+                        "password" => "testPass"
+                    )
+                )
+            )
+        );
+        $this->assertEquals(
+            "mysqli://testUser:***@example.com:21",
+            $this->object->getServerDSN(1)
+        );
     }
 
     /**
@@ -555,17 +575,6 @@ class ConfigFileTest extends PMATestCase
             'testData',
             $this->object->getServerName(1)
         );
-    }
-
-    /**
-     * Test for ConfigFile::getFilePath
-     *
-     * @return void
-     * @test
-     */
-    public function testGetFilePath()
-    {
-        $this->assertNotEmpty($this->object->getFilePath());
     }
 
     /**

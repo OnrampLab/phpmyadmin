@@ -2,10 +2,8 @@
 
 /**
  * Token utilities.
- *
- * @package    SqlParser
- * @subpackage Utils
  */
+
 namespace SqlParser\Utils;
 
 use SqlParser\Lexer;
@@ -16,19 +14,16 @@ use SqlParser\TokensList;
  * Token utilities.
  *
  * @category   Token
- * @package    SqlParser
- * @subpackage Utils
- * @author     Dan Ungureanu <udan1107@gmail.com>
- * @license    http://opensource.org/licenses/GPL-2.0 GNU Public License
+ *
+ * @license    https://www.gnu.org/licenses/gpl-2.0.txt GPL-2.0+
  */
 class Tokens
 {
-
     /**
      * Checks if a pattern is a match for the specified token.
      *
-     * @param Token $token   The token to be matched.
-     * @param array $pattern The pattern to be matches.
+     * @param Token $token   the token to be matched
+     * @param array $pattern the pattern to be matches
      *
      * @return bool
      */
@@ -73,7 +68,6 @@ class Tokens
 
     public static function replaceTokens($list, array $find, array $replace)
     {
-
         /**
          * Whether the first parameter is a list.
          *
@@ -151,7 +145,6 @@ class Tokens
                 ++$j;
                 ++$k;
             }
-
 
             // Checking if the sequence was found.
             if ($k === $findCount) {

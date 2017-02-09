@@ -6,6 +6,13 @@
  * @package PhpMyAdmin-test
  */
 
+/**
+ * Set precision to sane value, with higher values
+ * things behave slightly unexpectedly, for example
+ * round(1.2, 2) returns 1.199999999999999956.
+ */
+ini_set('precision', 14);
+
 // Let PHP complain about all errors
 error_reporting(E_ALL);
 
@@ -58,7 +65,7 @@ unset($CFG);
 require_once 'libraries/sql-parser/autoload.php';
 
 /* Ensure default langauge is active */
-require_once 'libraries/php-gettext/gettext.inc';
+require_once GETTEXT_INC;
 PMA\libraries\LanguageManager::getInstance()->getLanguage('en')->activate();
 
 // Set proxy information from env, if available

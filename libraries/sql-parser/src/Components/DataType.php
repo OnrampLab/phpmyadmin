@@ -2,10 +2,8 @@
 
 /**
  * Parses a data type.
- *
- * @package    SqlParser
- * @subpackage Components
  */
+
 namespace SqlParser\Components;
 
 use SqlParser\Component;
@@ -17,26 +15,23 @@ use SqlParser\TokensList;
  * Parses a data type.
  *
  * @category   Components
- * @package    SqlParser
- * @subpackage Components
- * @author     Dan Ungureanu <udan1107@gmail.com>
- * @license    http://opensource.org/licenses/GPL-2.0 GNU Public License
+ *
+ * @license    https://www.gnu.org/licenses/gpl-2.0.txt GPL-2.0+
  */
 class DataType extends Component
 {
-
     /**
      * All data type options.
      *
      * @var array
      */
     public static $DATA_TYPE_OPTIONS = array(
-        'BINARY'                        => 1,
-        'CHARACTER SET'                 => array(2, 'var'),
-        'CHARSET'                       => array(2, 'var'),
-        'COLLATE'                       => array(3, 'var'),
-        'UNSIGNED'                      => 4,
-        'ZEROFILL'                      => 5,
+        'BINARY' => 1,
+        'CHARACTER SET' => array(2, 'var'),
+        'CHARSET' => array(2, 'var'),
+        'COLLATE' => array(3, 'var'),
+        'UNSIGNED' => 4,
+        'ZEROFILL' => 5,
     );
 
     /**
@@ -71,9 +66,9 @@ class DataType extends Component
     /**
      * Constructor.
      *
-     * @param string       $name       The name of this data type.
-     * @param array        $parameters The parameters (size or possible values).
-     * @param OptionsArray $options    The options of this data type.
+     * @param string       $name       the name of this data type
+     * @param array        $parameters the parameters (size or possible values)
+     * @param OptionsArray $options    the options of this data type
      */
     public function __construct(
         $name = null,
@@ -86,15 +81,15 @@ class DataType extends Component
     }
 
     /**
-     * @param Parser     $parser  The parser that serves as context.
-     * @param TokensList $list    The list of tokens that are being parsed.
-     * @param array      $options Parameters for parsing.
+     * @param Parser     $parser  the parser that serves as context
+     * @param TokensList $list    the list of tokens that are being parsed
+     * @param array      $options parameters for parsing
      *
      * @return DataType
      */
     public static function parse(Parser $parser, TokensList $list, array $options = array())
     {
-        $ret = new DataType();
+        $ret = new self();
 
         /**
          * The state of the parser.
@@ -105,7 +100,7 @@ class DataType extends Component
          *
          *      1 ----------------[ size and options ]----------------> 2
          *
-         * @var int $state
+         * @var int
          */
         $state = 0;
 
@@ -113,7 +108,7 @@ class DataType extends Component
             /**
              * Token parsed at this moment.
              *
-             * @var Token $token
+             * @var Token
              */
             $token = $list->tokens[$list->idx];
 
@@ -139,7 +134,6 @@ class DataType extends Component
                 ++$list->idx;
                 break;
             }
-
         }
 
         if (empty($ret->name)) {
@@ -147,12 +141,13 @@ class DataType extends Component
         }
 
         --$list->idx;
+
         return $ret;
     }
 
     /**
-     * @param DataType $component The component to be built.
-     * @param array    $options   Parameters for building.
+     * @param DataType $component the component to be built
+     * @param array    $options   parameters for building
      *
      * @return string
      */

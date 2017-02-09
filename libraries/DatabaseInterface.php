@@ -48,6 +48,11 @@ class DatabaseInterface
     private $_table_cache;
 
     /**
+     * @var null|string lower_case_table_names value cache
+     */
+    private $_lower_case_table_names = null;
+
+    /**
      * Constructor
      *
      * @param DBIExtension $ext Object to be used for database queries
@@ -307,13 +312,13 @@ class DatabaseInterface
             if (true === $tbl_is_group) {
                 $sql_where_table = 'AND t.`TABLE_NAME` LIKE \''
                     . Util::escapeMysqlWildcards(
-                        Util::sqlAddSlashes($table)
+                        $GLOBALS['dbi']->escapeString($table)
                     )
                     . '%\'';
             } else {
                 $sql_where_table = 'AND t.`TABLE_NAME` '
                     . Util::getCollateForIS() . ' = \''
-                    . Util::sqlAddSlashes($table) . '\'';
+                    . $GLOBALS['dbi']->escapeString($table) . '\'';
             }
         } else {
             $sql_where_table = '';
@@ -428,7 +433,7 @@ class DatabaseInterface
             // comparison (if we are looking for the db Aa we don't want
             // to find the db aa)
             $this_databases = array_map(
-                'PMA\libraries\Util::sqlAddSlashes',
+                array($this, 'escapeString'),
                 $databases
             );
 
@@ -490,7 +495,7 @@ class DatabaseInterface
                     if ($table || (true === $tbl_is_group)) {
                         $sql .= " `Name` LIKE '"
                             . Util::escapeMysqlWildcards(
-                                Util::sqlAddSlashes($table, true)
+                                $this->escapeString($table, $link)
                             )
                             . "%'";
                         $needAnd = true;
@@ -851,7 +856,7 @@ class DatabaseInterface
             // get table information from information_schema
             if (! empty($database)) {
                 $sql_where_schema = 'WHERE `SCHEMA_NAME` LIKE \''
-                    . Util::sqlAddSlashes($database) . '\'';
+                    . $this->escapeString($database, $link) . '\'';
             } else {
                 $sql_where_schema = '';
             }
@@ -871,7 +876,8 @@ class DatabaseInterface
                     SUM(t.INDEX_LENGTH)    AS SCHEMA_INDEX_LENGTH,
                     SUM(t.DATA_LENGTH + t.INDEX_LENGTH)
                                            AS SCHEMA_LENGTH,
-                    SUM(t.DATA_FREE)       AS SCHEMA_DATA_FREE';
+                    SUM(IF(t.ENGINE <> \'InnoDB\', t.DATA_FREE, 0))
+                                           AS SCHEMA_DATA_FREE';
             }
             $sql .= '
                    FROM `information_schema`.SCHEMATA s';
@@ -1089,19 +1095,19 @@ class DatabaseInterface
             // get columns information from information_schema
             if (null !== $database) {
                 $sql_wheres[] = '`TABLE_SCHEMA` = \''
-                    . Util::sqlAddSlashes($database) . '\' ';
+                    . $this->escapeString($database, $link) . '\' ';
             } else {
                 $array_keys[] = 'TABLE_SCHEMA';
             }
             if (null !== $table) {
                 $sql_wheres[] = '`TABLE_NAME` = \''
-                    . Util::sqlAddSlashes($table) . '\' ';
+                    . $this->escapeString($table, $link) . '\' ';
             } else {
                 $array_keys[] = 'TABLE_NAME';
             }
             if (null !== $column) {
                 $sql_wheres[] = '`COLUMN_NAME` = \''
-                    . Util::sqlAddSlashes($column) . '\' ';
+                    . $this->escapeString($column, $link) . '\' ';
             } else {
                 $array_keys[] = 'COLUMN_NAME';
             }
@@ -1146,7 +1152,7 @@ class DatabaseInterface
             $sql = 'SHOW FULL COLUMNS FROM '
                 . Util::backquote($database) . '.' . Util::backquote($table);
             if (null !== $column) {
-                $sql .= " LIKE '" . Util::sqlAddSlashes($column, true) . "'";
+                $sql .= " LIKE '" . $this->escapeString($column, $link) . "'";
             }
 
             $columns = $this->fetchResult($sql, 'Field', null, $link);
@@ -1234,7 +1240,7 @@ class DatabaseInterface
         $sql = 'SHOW ' . ($full ? 'FULL' : '') . ' COLUMNS FROM '
             . Util::backquote($database) . '.' . Util::backquote($table)
             . (($column !== null) ? "LIKE '"
-            . Util::sqlAddSlashes($column, true) . "'" : '');
+            . $GLOBALS['dbi']->escapeString($column) . "'" : '');
 
         return $sql;
     }
@@ -1416,80 +1422,37 @@ class DatabaseInterface
     public function postConnect($link)
     {
         if (! defined('PMA_MYSQL_INT_VERSION')) {
-            if (Util::cacheExists('PMA_MYSQL_INT_VERSION')) {
+            $version = $this->fetchSingleRow(
+                'SELECT @@version, @@version_comment',
+                'ASSOC',
+                $link
+            );
+
+            if ($version) {
+                $match = explode('.', $version['@@version']);
+                define('PMA_MYSQL_MAJOR_VERSION', (int)$match[0]);
                 define(
                     'PMA_MYSQL_INT_VERSION',
-                    Util::cacheGet('PMA_MYSQL_INT_VERSION')
+                    (int) sprintf(
+                        '%d%02d%02d', $match[0], $match[1], intval($match[2])
+                    )
                 );
-                define(
-                    'PMA_MYSQL_MAJOR_VERSION',
-                    Util::cacheGet('PMA_MYSQL_MAJOR_VERSION')
-                );
-                define(
-                    'PMA_MYSQL_STR_VERSION',
-                    Util::cacheGet('PMA_MYSQL_STR_VERSION')
-                );
+                define('PMA_MYSQL_STR_VERSION', $version['@@version']);
                 define(
                     'PMA_MYSQL_VERSION_COMMENT',
-                    Util::cacheGet('PMA_MYSQL_VERSION_COMMENT')
-                );
-                define(
-                    'PMA_MARIADB',
-                    Util::cacheGet('PMA_MARIADB')
+                    $version['@@version_comment']
                 );
             } else {
-                $version = $this->fetchSingleRow(
-                    'SELECT @@version, @@version_comment',
-                    'ASSOC',
-                    $link
-                );
-
-                if ($version) {
-                    $match = explode('.', $version['@@version']);
-                    define('PMA_MYSQL_MAJOR_VERSION', (int)$match[0]);
-                    define(
-                        'PMA_MYSQL_INT_VERSION',
-                        (int) sprintf(
-                            '%d%02d%02d', $match[0], $match[1], intval($match[2])
-                        )
-                    );
-                    define('PMA_MYSQL_STR_VERSION', $version['@@version']);
-                    define(
-                        'PMA_MYSQL_VERSION_COMMENT',
-                        $version['@@version_comment']
-                    );
-                } else {
-                    define('PMA_MYSQL_INT_VERSION', 50501);
-                    define('PMA_MYSQL_MAJOR_VERSION', 5);
-                    define('PMA_MYSQL_STR_VERSION', '5.05.01');
-                    define('PMA_MYSQL_VERSION_COMMENT', '');
-                }
-                Util::cacheSet(
-                    'PMA_MYSQL_INT_VERSION',
-                    PMA_MYSQL_INT_VERSION
-                );
-                Util::cacheSet(
-                    'PMA_MYSQL_MAJOR_VERSION',
-                    PMA_MYSQL_MAJOR_VERSION
-                );
-                Util::cacheSet(
-                    'PMA_MYSQL_STR_VERSION',
-                    PMA_MYSQL_STR_VERSION
-                );
-                Util::cacheSet(
-                    'PMA_MYSQL_VERSION_COMMENT',
-                    PMA_MYSQL_VERSION_COMMENT
-                );
-                /* Detect MariaDB */
-                if (mb_strpos(PMA_MYSQL_STR_VERSION, 'MariaDB') !== false) {
-                    define('PMA_MARIADB', true);
-                } else {
-                    define('PMA_MARIADB', false);
-                }
-                Util::cacheSet(
-                    'PMA_MARIADB',
-                    PMA_MARIADB
-                );
+                define('PMA_MYSQL_INT_VERSION', 50501);
+                define('PMA_MYSQL_MAJOR_VERSION', 5);
+                define('PMA_MYSQL_STR_VERSION', '5.05.01');
+                define('PMA_MYSQL_VERSION_COMMENT', '');
+            }
+            /* Detect MariaDB */
+            if (mb_strpos(PMA_MYSQL_STR_VERSION, 'MariaDB') !== false) {
+                define('PMA_MARIADB', true);
+            } else {
+                define('PMA_MARIADB', false);
             }
         }
 
@@ -1500,24 +1463,22 @@ class DatabaseInterface
             $default_charset = 'utf8';
             $default_collation = 'utf8_general_ci';
         }
-        if (! empty($GLOBALS['collation_connection'])) {
+        $collation_connection = $GLOBALS['PMA_Config']->get('collation_connection');
+        if (! empty($collation_connection)) {
             $this->query(
                 "SET CHARACTER SET '$default_charset';",
                 $link,
                 self::QUERY_STORE
             );
-            /* Automatically adjust collation to mb4 variant */
-            if ($default_charset == 'utf8mb4'
-                && strncmp('utf8_', $GLOBALS['collation_connection'], 5) == 0
+            /* Automatically adjust collation if not supported by server */
+            if ($default_charset == 'utf8'
+                && strncmp('utf8mb4_', $collation_connection, 8) == 0
             ) {
-                $GLOBALS['collation_connection'] = 'utf8mb4_' . substr(
-                    $GLOBALS['collation_connection'],
-                    5
-                );
+                $collation_connection = 'utf8_' . substr($collation_connection, 8);
             }
             $result = $this->tryQuery(
                 "SET collation_connection = '"
-                . Util::sqlAddSlashes($GLOBALS['collation_connection'])
+                . $this->escapeString($collation_connection, $link)
                 . "';",
                 $link,
                 self::QUERY_STORE
@@ -1529,7 +1490,7 @@ class DatabaseInterface
                 );
                 $this->query(
                     "SET collation_connection = '"
-                    . Util::sqlAddSlashes($default_collation)
+                    . $this->escapeString($collation_connection, $link)
                     . "';",
                     $link,
                     self::QUERY_STORE
@@ -1866,10 +1827,11 @@ class DatabaseInterface
      * @param string $db    db name
      * @param string $which PROCEDURE | FUNCTION | EVENT | VIEW
      * @param string $name  the procedure|function|event|view name
+     * @param object $link  MySQL link
      *
      * @return string the definition
      */
-    public function getDefinition($db, $which, $name)
+    public function getDefinition($db, $which, $name, $link = null)
     {
         $returned_field = array(
             'PROCEDURE' => 'Create Procedure',
@@ -1880,7 +1842,7 @@ class DatabaseInterface
         $query = 'SHOW CREATE ' . $which . ' '
             . Util::backquote($db) . '.'
             . Util::backquote($name);
-        return($this->fetchValue($query, 0, $returned_field[$which]));
+        return($this->fetchValue($query, 0, $returned_field[$which], $link));
     }
 
     /**
@@ -1912,13 +1874,13 @@ class DatabaseInterface
                 . " `DTD_IDENTIFIER`"
                 . " FROM `information_schema`.`ROUTINES`"
                 . " WHERE `ROUTINE_SCHEMA` " . Util::getCollateForIS()
-                . " = '" . Util::sqlAddSlashes($db) . "'";
+                . " = '" . $GLOBALS['dbi']->escapeString($db) . "'";
             if (PMA_isValid($which, array('FUNCTION','PROCEDURE'))) {
                 $query .= " AND `ROUTINE_TYPE` = '" . $which . "'";
             }
             if (! empty($name)) {
                 $query .= " AND `SPECIFIC_NAME`"
-                    . " = '" . Util::sqlAddSlashes($name) . "'";
+                    . " = '" . $GLOBALS['dbi']->escapeString($name) . "'";
             }
             $result = $this->fetchResult($query);
             if (!empty($result)) {
@@ -1927,10 +1889,10 @@ class DatabaseInterface
         } else {
             if ($which == 'FUNCTION' || $which == null) {
                 $query = "SHOW FUNCTION STATUS"
-                    . " WHERE `Db` = '" . Util::sqlAddSlashes($db) . "'";
+                    . " WHERE `Db` = '" . $GLOBALS['dbi']->escapeString($db) . "'";
                 if (! empty($name)) {
                     $query .= " AND `Name` = '"
-                        . Util::sqlAddSlashes($name) . "'";
+                        . $GLOBALS['dbi']->escapeString($name) . "'";
                 }
                 $result = $this->fetchResult($query);
                 if (!empty($result)) {
@@ -1939,10 +1901,10 @@ class DatabaseInterface
             }
             if ($which == 'PROCEDURE' || $which == null) {
                 $query = "SHOW PROCEDURE STATUS"
-                    . " WHERE `Db` = '" . Util::sqlAddSlashes($db) . "'";
+                    . " WHERE `Db` = '" . $GLOBALS['dbi']->escapeString($db) . "'";
                 if (! empty($name)) {
                     $query .= " AND `Name` = '"
-                        . Util::sqlAddSlashes($name) . "'";
+                        . $GLOBALS['dbi']->escapeString($name) . "'";
                 }
                 $result = $this->fetchResult($query);
                 if (!empty($result)) {
@@ -2002,16 +1964,16 @@ class DatabaseInterface
                 . "`DATABASE_COLLATION` AS `Database Collation`"
                 . " FROM `information_schema`.`EVENTS`"
                 . " WHERE `EVENT_SCHEMA` " . Util::getCollateForIS()
-                . " = '" . Util::sqlAddSlashes($db) . "'";
+                . " = '" . $GLOBALS['dbi']->escapeString($db) . "'";
             if (! empty($name)) {
                 $query .= " AND `EVENT_NAME`"
-                    . " = '" . Util::sqlAddSlashes($name) . "'";
+                    . " = '" . $GLOBALS['dbi']->escapeString($name) . "'";
             }
         } else {
             $query = "SHOW EVENTS FROM " . Util::backquote($db);
             if (! empty($name)) {
                 $query .= " AND `Name` = '"
-                    . Util::sqlAddSlashes($name) . "'";
+                    . $GLOBALS['dbi']->escapeString($name) . "'";
             }
         }
 
@@ -2054,16 +2016,16 @@ class DatabaseInterface
                 . ', EVENT_OBJECT_SCHEMA, EVENT_OBJECT_TABLE, DEFINER'
                 . ' FROM information_schema.TRIGGERS'
                 . ' WHERE EVENT_OBJECT_SCHEMA ' . Util::getCollateForIS() . '='
-                . ' \'' . Util::sqlAddSlashes($db) . '\'';
+                . ' \'' . $GLOBALS['dbi']->escapeString($db) . '\'';
 
             if (! empty($table)) {
                 $query .= " AND EVENT_OBJECT_TABLE " . Util::getCollateForIS()
-                    . " = '" . Util::sqlAddSlashes($table) . "';";
+                    . " = '" . $GLOBALS['dbi']->escapeString($table) . "';";
             }
         } else {
             $query = "SHOW TRIGGERS FROM " . Util::backquote($db);
             if (! empty($table)) {
-                $query .= " LIKE '" . Util::sqlAddSlashes($table, true) . "';";
+                $query .= " LIKE '" . $GLOBALS['dbi']->escapeString($table) . "';";
             }
         }
 
@@ -2176,7 +2138,7 @@ class DatabaseInterface
         if (Util::cacheExists('mysql_cur_user')) {
             return Util::cacheGet('mysql_cur_user');
         }
-        $user = $GLOBALS['dbi']->fetchValue('SELECT USER();');
+        $user = $GLOBALS['dbi']->fetchValue('SELECT CURRENT_USER();');
         if ($user !== false) {
             Util::cacheSet('mysql_cur_user', $user);
             return Util::cacheGet('mysql_cur_user');
@@ -2298,6 +2260,21 @@ class DatabaseInterface
     }
 
     /**
+     * Returns value for lower_case_table_names variable
+     *
+     * @return string
+     */
+    public function getLowerCaseNames()
+    {
+        if (is_null($this->_lower_case_table_names)) {
+            $this->_lower_case_table_names = $this->fetchValue(
+                "SELECT @@lower_case_table_names"
+            );
+        }
+        return $this->_lower_case_table_names;
+    }
+
+    /**
      * Get the list of system schemas
      *
      * @return array list of system schemas
@@ -2350,21 +2327,12 @@ class DatabaseInterface
         $user, $password, $is_controluser = false, $server = null,
         $auxiliary_connection = false
     ) {
-        $error_count = $GLOBALS['error_handler']->countErrors();
+        // Do not show location and backtrace for connection errors
+        $GLOBALS['error_handler']->setHideLocation(true);
         $result = $this->_extension->connect(
             $user, $password, $is_controluser, $server, $auxiliary_connection
         );
-
-        /* Any errors from connection? */
-        if ($GLOBALS['error_handler']->countErrors() > $error_count) {
-            $errors = $GLOBALS['error_handler']->sliceErrors($error_count);
-            foreach ($errors as $error) {
-                trigger_error(
-                    $error->getMessage(),
-                    E_USER_ERROR
-                );
-            }
-        }
+        $GLOBALS['error_handler']->setHideLocation(false);
 
         if ($result) {
             if (! $auxiliary_connection && ! $is_controluser) {
@@ -2645,7 +2613,25 @@ class DatabaseInterface
      */
     public function getFieldsMeta($result)
     {
-        return $this->_extension->getFieldsMeta($result);
+        $result = $this->_extension->getFieldsMeta($result);
+
+        if ($this->getLowerCaseNames() === '2') {
+            /**
+             * Fixup orgtable for lower_case_table_names = 2
+             *
+             * In this setup MySQL server reports table name lower case
+             * but we still need to operate on original case to properly
+             * match existing strings
+             */
+            foreach ($result as $value) {
+                if (strlen($value->orgtable) !== 0 &&
+                        mb_strtolower($value->orgtable) === mb_strtolower($value->table)) {
+                    $value->orgtable = $value->table;
+                }
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -2700,6 +2686,27 @@ class DatabaseInterface
     }
 
     /**
+     * returns properly escaped string for use in MySQL queries
+     *
+     * @param string $str  string to be escaped
+     * @param mixed  $link optional database link to use
+     *
+     * @return string a MySQL escaped string
+     */
+    public function escapeString($str, $link = null)
+    {
+        if ($link === null) {
+            $link = $this->getLink();
+        }
+
+        if ($this->_extension === null) {
+            return $str;
+        }
+
+        return $this->_extension->escapeString($link, $str);
+    }
+
+    /**
      * Gets server connection port
      *
      * @param array|null $server host/port/socket/persistent
@@ -2712,6 +2719,9 @@ class DatabaseInterface
             $server = &$GLOBALS['cfg']['Server'];
         }
 
+        if (empty($server['port'])) {
+            return 0;
+        }
         return intval($server['port']);
     }
 

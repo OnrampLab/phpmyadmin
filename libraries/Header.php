@@ -8,6 +8,7 @@
 namespace PMA\libraries;
 
 use PMA\libraries\navigation\Navigation;
+use PMA\libraries\Config;
 
 require_once 'libraries/js_escape.lib.php';
 require_once 'libraries/url_generating.lib.php';
@@ -427,14 +428,7 @@ class Header
                     $retval .= $nav->getDisplay();
                 }
                 // Include possible custom headers
-                if (file_exists(CUSTOM_HEADER_FILE)) {
-                    $retval .= '<div id="pma_header">';
-                    ob_start();
-                    include CUSTOM_HEADER_FILE;
-                    $retval .= ob_get_contents();
-                    ob_end_clean();
-                    $retval .= '</div>';
-                }
+                $retval .= Config::renderHeader();
                 // offer to load user preferences from localStorage
                 if ($this->_userprefsOfferImport) {
                     include_once './libraries/user_preferences.lib.php';
@@ -603,6 +597,11 @@ class Header
         header(
             'X-Permitted-Cross-Domain-Policies: none'
         );
+        // Robots meta tag
+        // see https://developers.google.com/webmasters/control-crawl-index/docs/robots_meta_tag
+        header(
+            'X-Robots-Tag: noindex, nofollow'
+        );
         PMA_noCacheHeader();
         if (! defined('IS_TRANSFORMATION_WRAPPER')) {
             // Define the charset to be used
@@ -641,7 +640,7 @@ class Header
         $retval  = '<meta charset="utf-8" />';
         $retval .= '<meta name="referrer" content="no-referrer" />';
         $retval .= '<meta name="robots" content="noindex,nofollow" />';
-        $retval .= '<meta http-equiv="X-UA-Compatible" content="IE=Edge">';
+        $retval .= '<meta http-equiv="X-UA-Compatible" content="IE=Edge" />';
         if (! $GLOBALS['cfg']['AllowThirdPartyFraming']) {
             $retval .= '<style id="cfs-style">html{display: none;}</style>';
         }

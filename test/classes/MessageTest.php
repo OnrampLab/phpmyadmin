@@ -110,6 +110,7 @@ class MessageTest extends PMATestCase
     {
         $this->object = new PMA\libraries\Message('', PMA\libraries\Message::ERROR);
         $this->object->setMessage('test<&>');
+        $this->object->setBBCode(false);
 
         $this->assertEquals($this->object, PMA\libraries\Message::rawError('test<&>'));
     }
@@ -123,6 +124,7 @@ class MessageTest extends PMATestCase
     {
         $this->object = new PMA\libraries\Message('', PMA\libraries\Message::NOTICE);
         $this->object->setMessage('test<&>');
+        $this->object->setBBCode(false);
 
         $this->assertEquals($this->object, PMA\libraries\Message::rawNotice('test<&>'));
     }
@@ -136,6 +138,7 @@ class MessageTest extends PMATestCase
     {
         $this->object = new PMA\libraries\Message('', PMA\libraries\Message::SUCCESS);
         $this->object->setMessage('test<&>');
+        $this->object->setBBCode(false);
 
         $this->assertEquals($this->object, PMA\libraries\Message::rawSuccess('test<&>'));
     }
@@ -351,8 +354,8 @@ class MessageTest extends PMATestCase
                 '<kbd>test</kbd><br /><sup>test</sup>'
             ),
             array(
-                '[a@http://foo.bar/@Documentation]link[/a]',
-                '<a href="./url.php?url=http%3A%2F%2Ffoo.bar%2F"'
+                '[a@https://example.com/@Documentation]link[/a]',
+                '<a href="./url.php?url=https%3A%2F%2Fexample.com%2F"'
                 . ' target="Documentation">link</a>'
             ),
             array(

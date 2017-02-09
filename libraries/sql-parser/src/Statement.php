@@ -5,9 +5,8 @@
  * class defined here.
  *
  * A statement represents the result of parsing the lexemes.
- *
- * @package SqlParser
  */
+
 namespace SqlParser;
 
 use SqlParser\Components\OptionsArray;
@@ -16,13 +15,11 @@ use SqlParser\Components\OptionsArray;
  * Abstract statement definition.
  *
  * @category Statements
- * @package  SqlParser
- * @author   Dan Ungureanu <udan1107@gmail.com>
- * @license  http://opensource.org/licenses/GPL-2.0 GNU Public License
+ *
+ * @license  https://www.gnu.org/licenses/gpl-2.0.txt GPL-2.0+
  */
 abstract class Statement
 {
-
     /**
      * Options for this statement.
      *
@@ -84,8 +81,8 @@ abstract class Statement
     /**
      * Constructor.
      *
-     * @param Parser     $parser The instance that requests parsing.
-     * @param TokensList $list   The list of tokens to be parsed.
+     * @param Parser     $parser the instance that requests parsing
+     * @param TokensList $list   the list of tokens to be parsed
      */
     public function __construct(Parser $parser = null, TokensList $list = null)
     {
@@ -104,7 +101,7 @@ abstract class Statement
         /**
          * Query to be returned.
          *
-         * @var string $query
+         * @var string
          */
         $query = '';
 
@@ -133,7 +130,7 @@ abstract class Statement
             /**
              * The name of the clause.
              *
-             * @var string $name
+             * @var string
              */
             $name = $clause[0];
 
@@ -141,14 +138,15 @@ abstract class Statement
              * The type of the clause.
              *
              * @see self::$CLAUSES
-             * @var int $type
+             *
+             * @var int
              */
             $type = $clause[1];
 
             /**
              * The builder (parser) of this clause.
              *
-             * @var Component $class
+             * @var Component
              */
             $class = Parser::$KEYWORD_PARSERS[$name]['class'];
 
@@ -156,7 +154,7 @@ abstract class Statement
              * The name of the field that is used as source for the builder.
              * Same field is used to store the result of parsing.
              *
-             * @var string $field
+             * @var string
              */
             $field = Parser::$KEYWORD_PARSERS[$name]['field'];
 
@@ -190,10 +188,8 @@ abstract class Statement
     /**
      * Parses the statements defined by the tokens list.
      *
-     * @param Parser     $parser The instance that requests parsing.
-     * @param TokensList $list   The list of tokens to be parsed.
-     *
-     * @return void
+     * @param Parser     $parser the instance that requests parsing
+     * @param TokensList $list   the list of tokens to be parsed
      */
     public function parse(Parser $parser, TokensList $list)
     {
@@ -201,7 +197,7 @@ abstract class Statement
          * Array containing all list of clauses parsed.
          * This is used to check for duplicates.
          *
-         * @var array $parsedClauses
+         * @var array
          */
         $parsedClauses = array();
 
@@ -213,7 +209,7 @@ abstract class Statement
          * For statements that do not have any options this is set to `true` by
          * default.
          *
-         * @var bool $parsedOptions
+         * @var bool
          */
         $parsedOptions = empty(static::$OPTIONS);
 
@@ -221,7 +217,7 @@ abstract class Statement
             /**
              * Token parsed at this moment.
              *
-             * @var Token $token
+             * @var Token
              */
             $token = $list->tokens[$list->idx];
 
@@ -254,24 +250,50 @@ abstract class Statement
                 break;
             }
 
+            $lastIdx = $list->idx;
+
+            // ON DUPLICATE KEY UPDATE ...
+            // has to be parsed in parent statement (INSERT or REPLACE)
+            // so look for it and break
+            if (get_class($this) === 'SqlParser\Statements\SelectStatement'
+                && $token->value === 'ON'
+            ) {
+                ++$list->idx; // Skip ON
+
+                // look for ON DUPLICATE KEY UPDATE
+                $first = $list->getNextOfType(Token::TYPE_KEYWORD);
+                $second = $list->getNextOfType(Token::TYPE_KEYWORD);
+                $third = $list->getNextOfType(Token::TYPE_KEYWORD);
+
+                if ($first && $second && $third
+                    && $first->value === 'DUPLICATE'
+                    && $second->value === 'KEY'
+                    && $third->value === 'UPDATE'
+                ) {
+                    $list->idx = $lastIdx;
+                    break;
+                }
+            }
+            $list->idx = $lastIdx;
+
             /**
              * The name of the class that is used for parsing.
              *
-             * @var Component $class
+             * @var Component
              */
             $class = null;
 
             /**
              * The name of the field where the result of the parsing is stored.
              *
-             * @var string $field
+             * @var string
              */
             $field = null;
 
             /**
              * Parser's options.
              *
-             * @var array $options
+             * @var array
              */
             $options = array();
 
@@ -327,10 +349,23 @@ abstract class Statement
                     $parsedOptions = true;
                 }
             } elseif ($class === null) {
-                // There is no parser for this keyword and isn't the beginning
-                // of a statement (so no options) either.
-                $parser->error(__('Unrecognized keyword.'), $token);
-                continue;
+                // Handle special end options in Select statement
+                // See Statements\SelectStatement::$END_OPTIONS
+                if (get_class($this) === 'SqlParser\Statements\SelectStatement'
+                    && ($token->value === 'FOR UPDATE'
+                    || $token->value === 'LOCK IN SHARE MODE')
+                ) {
+                    $this->end_options = OptionsArray::parse(
+                        $parser,
+                        $list,
+                        static::$END_OPTIONS
+                    );
+                } else {
+                    // There is no parser for this keyword and isn't the beginning
+                    // of a statement (so no options) either.
+                    $parser->error(__('Unrecognized keyword.'), $token);
+                    continue;
+                }
             }
 
             $this->before($parser, $list, $token);
@@ -351,29 +386,23 @@ abstract class Statement
     /**
      * Function called before the token is processed.
      *
-     * @param Parser     $parser The instance that requests parsing.
-     * @param TokensList $list   The list of tokens to be parsed.
-     * @param Token      $token  The token that is being parsed.
-     *
-     * @return void
+     * @param Parser     $parser the instance that requests parsing
+     * @param TokensList $list   the list of tokens to be parsed
+     * @param Token      $token  the token that is being parsed
      */
     public function before(Parser $parser, TokensList $list, Token $token)
     {
-
     }
 
     /**
      * Function called after the token was processed.
      *
-     * @param Parser     $parser The instance that requests parsing.
-     * @param TokensList $list   The list of tokens to be parsed.
-     * @param Token      $token  The token that is being parsed.
-     *
-     * @return void
+     * @param Parser     $parser the instance that requests parsing
+     * @param TokensList $list   the list of tokens to be parsed
+     * @param Token      $token  the token that is being parsed
      */
     public function after(Parser $parser, TokensList $list, Token $token)
     {
-
     }
 
     /**
@@ -396,5 +425,77 @@ abstract class Statement
     public function __toString()
     {
         return $this->build();
+    }
+
+    /**
+     * Validates the order of the clauses in parsed statement
+     * Ideally this should be called after successfully
+     * completing the parsing of each statement.
+     *
+     * @param Parser     $parser the instance that requests parsing
+     * @param TokensList $list   the list of tokens to be parsed
+     *
+     * @return bool
+     */
+    public function validateClauseOrder($parser, $list)
+    {
+        $clauses = array_flip(array_keys($this->getClauses()));
+
+        if (empty($clauses)
+            || count($clauses) == 0
+        ) {
+            return true;
+        }
+
+        $minIdx = -1;
+
+        /**
+         * For tracking JOIN clauses in a query
+         *   0 - JOIN not found till now
+         *   1 - JOIN has been found
+         *   2 - A Non-JOIN clause has been found
+         *       after a previously found JOIN clause.
+         *
+         * @var int
+         */
+        $joinStart = 0;
+
+        $error = 0;
+        foreach ($clauses as $clauseType => $index) {
+            $clauseStartIdx = Utils\Query::getClauseStartOffset(
+                $this,
+                $list,
+                $clauseType
+            );
+
+            // Handle ordering of Multiple Joins in a query
+            if ($clauseStartIdx != -1) {
+                if ($joinStart == 0 && stripos($clauseType, 'JOIN') !== false) {
+                    $joinStart = 1;
+                } elseif ($joinStart == 1 && stripos($clauseType, 'JOIN') === false) {
+                    $joinStart = 2;
+                } elseif ($joinStart == 2 && stripos($clauseType, 'JOIN') !== false) {
+                    $error = 1;
+                }
+            }
+
+            if ($clauseStartIdx != -1 && $clauseStartIdx < $minIdx) {
+                if ($joinStart == 0 || ($joinStart == 2 && $error = 1)) {
+                    $token = $list->tokens[$clauseStartIdx];
+                    $parser->error(
+                        __('Unexpected ordering of clauses.'),
+                        $token
+                    );
+
+                    return false;
+                } else {
+                    $minIdx = $clauseStartIdx;
+                }
+            } elseif ($clauseStartIdx != -1) {
+                $minIdx = $clauseStartIdx;
+            }
+        }
+
+        return true;
     }
 }

@@ -2,16 +2,18 @@
 
 /**
  * `INSERT` statement.
- *
- * @package    SqlParser
- * @subpackage Statements
  */
+
 namespace SqlParser\Statements;
 
+use SqlParser\Parser;
+use SqlParser\Token;
+use SqlParser\TokensList;
 use SqlParser\Statement;
 use SqlParser\Components\IntoKeyword;
 use SqlParser\Components\Array2d;
-use SqlParser\Components\ArrayObj;
+use SqlParser\Components\OptionsArray;
+use SqlParser\Components\SetOperation;
 
 /**
  * `INSERT` statement.
@@ -47,24 +49,21 @@ use SqlParser\Components\ArrayObj;
  *         [, col_name=expr] ... ]
  *
  * @category   Statements
- * @package    SqlParser
- * @subpackage Statements
- * @author     Dan Ungureanu <udan1107@gmail.com>
- * @license    http://opensource.org/licenses/GPL-2.0 GNU Public License
+ *
+ * @license    https://www.gnu.org/licenses/gpl-2.0.txt GPL-2.0+
  */
 class InsertStatement extends Statement
 {
-
     /**
      * Options for `INSERT` statements.
      *
      * @var array
      */
     public static $OPTIONS = array(
-        'LOW_PRIORITY'                  => 1,
-        'DELAYED'                       => 2,
-        'HIGH_PRIORITY'                 => 3,
-        'IGNORE'                        => 4,
+        'LOW_PRIORITY' => 1,
+        'DELAYED' => 2,
+        'HIGH_PRIORITY' => 3,
+        'IGNORE' => 4,
     );
 
     /**
@@ -77,17 +76,187 @@ class InsertStatement extends Statement
     /**
      * Values to be inserted.
      *
-     * @var ArrayObj[]
+     * @var ArrayObj[]|null
      */
     public $values;
+
+    /**
+     * If SET clause is present
+     * holds the SetOperation.
+     *
+     * @var SetOperation[]
+     */
+    public $set;
+
+    /**
+     * If SELECT clause is present
+     * holds the SelectStatement.
+     *
+     * @var SelectStatement
+     */
+    public $select;
+
+    /**
+     * If ON DUPLICATE KEY UPDATE clause is present
+     * holds the SetOperation.
+     *
+     * @var SetOperation[]
+     */
+    public $onDuplicateSet;
 
     /**
      * @return string
      */
     public function build()
     {
-        return 'INSERT ' . $this->options
-            . ' INTO ' . $this->into
-            . ' VALUES ' . ArrayObj::build($this->values);
+        $ret = 'INSERT ' . $this->options
+            . ' INTO ' . $this->into;
+
+        if ($this->values != null && count($this->values) > 0) {
+            $ret .= ' VALUES ' . Array2d::build($this->values);
+        } elseif ($this->set != null && count($this->set) > 0) {
+            $ret .= ' SET ' . SetOperation::build($this->set);
+        } elseif ($this->select != null && strlen($this->select) > 0) {
+            $ret .= ' ' . $this->select->build();
+        }
+
+        if ($this->onDuplicateSet != null && count($this->onDuplicateSet) > 0) {
+            $ret .= ' ON DUPLICATE KEY UPDATE ' . SetOperation::build($this->onDuplicateSet);
+        }
+
+        return $ret;
+    }
+
+    /**
+     * @param Parser     $parser the instance that requests parsing
+     * @param TokensList $list   the list of tokens to be parsed
+     */
+    public function parse(Parser $parser, TokensList $list)
+    {
+        ++$list->idx; // Skipping `INSERT`.
+
+        // parse any options if provided
+        $this->options = OptionsArray::parse(
+            $parser,
+            $list,
+            static::$OPTIONS
+        );
+        ++$list->idx;
+
+        /**
+         * The state of the parser.
+         *
+         * Below are the states of the parser.
+         *
+         *      0 ---------------------------------[ INTO ]----------------------------------> 1
+         *
+         *      1 -------------------------[ VALUES/VALUE/SET/SELECT ]-----------------------> 2
+         *
+         *      2 -------------------------[ ON DUPLICATE KEY UPDATE ]-----------------------> 3
+         *
+         * @var int
+         */
+        $state = 0;
+
+        /**
+         * For keeping track of semi-states on encountering
+         * ON DUPLICATE KEY UPDATE ...
+         */
+        $miniState = 0;
+
+        for (; $list->idx < $list->count; ++$list->idx) {
+            /**
+             * Token parsed at this moment.
+             *
+             * @var Token
+             */
+            $token = $list->tokens[$list->idx];
+
+            // End of statement.
+            if ($token->type === Token::TYPE_DELIMITER) {
+                break;
+            }
+
+            // Skipping whitespaces and comments.
+            if (($token->type === Token::TYPE_WHITESPACE) || ($token->type === Token::TYPE_COMMENT)) {
+                continue;
+            }
+
+            if ($state === 0) {
+                if ($token->type === Token::TYPE_KEYWORD
+                    && $token->value !== 'INTO'
+                ) {
+                    $parser->error(__('Unexpected keyword.'), $token);
+                    break;
+                } else {
+                    ++$list->idx;
+                    $this->into = IntoKeyword::parse(
+                        $parser,
+                        $list,
+                        array('fromInsert' => true)
+                    );
+                }
+
+                $state = 1;
+            } elseif ($state === 1) {
+                if ($token->type === Token::TYPE_KEYWORD) {
+                    if ($token->value === 'VALUE'
+                        || $token->value === 'VALUES'
+                    ) {
+                        ++$list->idx; // skip VALUES
+
+                        $this->values = Array2d::parse($parser, $list);
+                    } elseif ($token->value === 'SET') {
+                        ++$list->idx; // skip SET
+
+                        $this->set = SetOperation::parse($parser, $list);
+                    } elseif ($token->value === 'SELECT') {
+                        $this->select = new SelectStatement($parser, $list);
+                    } else {
+                        $parser->error(
+                            __('Unexpected keyword.'),
+                            $token
+                        );
+                        break;
+                    }
+                    $state = 2;
+                    $miniState = 1;
+                } else {
+                    $parser->error(
+                        __('Unexpected token.'),
+                        $token
+                    );
+                    break;
+                }
+            } elseif ($state == 2) {
+                $lastCount = $miniState;
+
+                if ($miniState === 1 && $token->value === 'ON') {
+                    ++$miniState;
+                } elseif ($miniState === 2 && $token->value === 'DUPLICATE') {
+                    ++$miniState;
+                } elseif ($miniState === 3 && $token->value === 'KEY') {
+                    ++$miniState;
+                } elseif ($miniState === 4 && $token->value === 'UPDATE') {
+                    ++$miniState;
+                }
+
+                if ($lastCount === $miniState) {
+                    $parser->error(
+                        __('Unexpected token.'),
+                        $token
+                    );
+                    break;
+                }
+
+                if ($miniState === 5) {
+                    ++$list->idx;
+                    $this->onDuplicateSet = SetOperation::parse($parser, $list);
+                    $state = 3;
+                }
+            }
+        }
+
+        --$list->idx;
     }
 }

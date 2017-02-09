@@ -790,7 +790,7 @@ class DatabaseStructureController extends DatabaseController
 
             $do = strlen($searchDoDBInTruename) > 0
                 || strlen($searchDoDBInDB) > 0
-                || ($nbServSlaveDoDb == 1 && $nbServSlaveIgnoreDb == 1)
+                || ($nbServSlaveDoDb == 0 && $nbServSlaveIgnoreDb == 0)
                 || $this->hasTable(
                     $GLOBALS['replication_info']['slave']['Wild_Do_Table'],
                     $table
@@ -887,7 +887,7 @@ class DatabaseStructureController extends DatabaseController
             if ($this->db == PMA_extractDbOrTable($db_table)
                 && preg_match(
                     "@^" .
-                    mb_substr(PMA_extractDbOrTable($db_table, 'table'), 0, -1) . "@",
+                    preg_quote(mb_substr(PMA_extractDbOrTable($db_table, 'table'), 0, -1)) . "@",
                     $truename
                 )
             ) {

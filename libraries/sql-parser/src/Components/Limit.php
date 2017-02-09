@@ -2,10 +2,8 @@
 
 /**
  * `LIMIT` keyword parser.
- *
- * @package    SqlParser
- * @subpackage Components
  */
+
 namespace SqlParser\Components;
 
 use SqlParser\Component;
@@ -17,14 +15,11 @@ use SqlParser\TokensList;
  * `LIMIT` keyword parser.
  *
  * @category   Keywords
- * @package    SqlParser
- * @subpackage Components
- * @author     Dan Ungureanu <udan1107@gmail.com>
- * @license    http://opensource.org/licenses/GPL-2.0 GNU Public License
+ *
+ * @license    https://www.gnu.org/licenses/gpl-2.0.txt GPL-2.0+
  */
 class Limit extends Component
 {
-
     /**
      * The number of rows skipped.
      *
@@ -42,8 +37,8 @@ class Limit extends Component
     /**
      * Constructor.
      *
-     * @param int $rowCount The row count.
-     * @param int $offset   The offset.
+     * @param int $rowCount the row count
+     * @param int $offset   the offset
      */
     public function __construct($rowCount = 0, $offset = 0)
     {
@@ -52,15 +47,15 @@ class Limit extends Component
     }
 
     /**
-     * @param Parser     $parser  The parser that serves as context.
-     * @param TokensList $list    The list of tokens that are being parsed.
-     * @param array      $options Parameters for parsing.
+     * @param Parser     $parser  the parser that serves as context
+     * @param TokensList $list    the list of tokens that are being parsed
+     * @param array      $options parameters for parsing
      *
      * @return Limit
      */
     public static function parse(Parser $parser, TokensList $list, array $options = array())
     {
-        $ret = new Limit();
+        $ret = new self();
 
         $offset = false;
 
@@ -68,7 +63,7 @@ class Limit extends Component
             /**
              * Token parsed at this moment.
              *
-             * @var Token $token
+             * @var Token
              */
             $token = $list->tokens[$list->idx];
 
@@ -116,21 +111,18 @@ class Limit extends Component
         }
 
         --$list->idx;
+
         return $ret;
     }
 
     /**
-     * @param Limit $component The component to be built.
-     * @param array $options   Parameters for building.
+     * @param Limit $component the component to be built
+     * @param array $options   parameters for building
      *
      * @return string
      */
     public static function build($component, array $options = array())
     {
-        if (empty($component->offset)) {
-            return (string) $component->rowCount;
-        } else {
-            return $component->offset . ', ' . $component->rowCount;
-        }
+        return $component->offset . ', ' . $component->rowCount;
     }
 }

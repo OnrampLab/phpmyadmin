@@ -107,7 +107,7 @@ class AuthenticationHttpTest extends PMATestCase
             ->with()
             ->will($this->returnValue(false));
 
-        $mockResponse->expects($this->exactly($set_title * 6))
+        $mockResponse->expects($this->exactly($set_title * 7))
             ->method('addHTML')
             ->with();
 
@@ -144,11 +144,11 @@ class AuthenticationHttpTest extends PMATestCase
     {
 
         $_REQUEST['old_usr'] = '1';
-        $GLOBALS['cfg']['Server']['LogoutURL'] = 'http://phpmyadmin.net/logout';
+        $GLOBALS['cfg']['Server']['LogoutURL'] = 'https://example.com/logout';
 
         $this->doMockResponse(
             0, 0, 0,
-            array('Location: http://phpmyadmin.net/logout' . ((SID) ? '?' . SID : ''))
+            array('Location: https://example.com/logout')
         );
     }
 
