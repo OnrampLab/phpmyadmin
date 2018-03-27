@@ -9,7 +9,7 @@ $i = 0;
 // [1]
 $i++;
 $cfg['Servers'][$i] = getDefaultConfig();
-$cfg['Servers'][$i]['host'] = '127.0.0.1';
+$cfg['Servers'][$i]['host'] = '127.0.0.1';  // localhost
 
 // [2]
 // ....

@@ -22,8 +22,7 @@ install
 
 phpmyadmin version
 
-    4.7.9
-    4.6.6
+    4.6.6 to 4.7.9
 
 
 phpmyadmin self upgrade
