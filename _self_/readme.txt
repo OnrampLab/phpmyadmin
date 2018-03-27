@@ -7,12 +7,14 @@ install
         sudo apt-get install -y php-mbstring
 
     設定檔
+        cd /var/www/phpmyadmin
         cp _self_/config.inc.php config.inc.php
         vi config.inc.php
         chmod 644 config.inc.php
 
     建立 phpmyadmin table
-        import from "sql/create_tables.sql"
+        mysql -u root -e "create database 'phpmyadmin'"
+        mysql -u root -p phpmyadmin < sql/create_tables.sql
 
     security setting
         vi .htaccess
@@ -30,6 +32,16 @@ phpmyadmin self upgrade
 
     rm -rf setup/
 
+
+ubuntu bash on windows (WSL)
+
+    在 WSL 上面的 linux 檔案權限都是 777
+    所以 config.inc.php 需要用 ln 外連到 linux 目錄中
+
+    cd /var/www/phpmyadmin
+    mv config.inc.php /var/phpmyadmin.config.inc.php
+    ln -s /var/phpmyadmin.config.inc.php config.inc.php
+    chmod 644 config.inc.php
 
 錯誤查詢
 
