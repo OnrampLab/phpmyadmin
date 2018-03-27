@@ -22,6 +22,7 @@ install
 
 phpmyadmin version
 
+    4.7.9
     4.6.6
 
 
@@ -30,7 +31,8 @@ phpmyadmin self upgrade
     delete source code
     add source code
 
-    rm -rf setup/
+    mv examples /tmp/
+    mv setup /tmp/
 
 
 ubuntu bash on windows (WSL)
