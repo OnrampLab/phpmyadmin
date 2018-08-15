@@ -1,120 +1,17 @@
 [
     {
-        "name": "symfony/expression-language",
-        "version": "v2.8.35",
-        "version_normalized": "2.8.35.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/symfony/expression-language.git",
-            "reference": "422bf02386ab46f615d1d784b771599357461d73"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/symfony/expression-language/zipball/422bf02386ab46f615d1d784b771599357461d73",
-            "reference": "422bf02386ab46f615d1d784b771599357461d73",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.9"
-        },
-        "time": "2018-01-03T07:36:31+00:00",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "2.8-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Symfony\\Component\\ExpressionLanguage\\": ""
-            },
-            "exclude-from-classmap": [
-                "/Tests/"
-            ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Fabien Potencier",
-                "email": "fabien@symfony.com"
-            },
-            {
-                "name": "Symfony Community",
-                "homepage": "https://symfony.com/contributors"
-            }
-        ],
-        "description": "Symfony ExpressionLanguage Component",
-        "homepage": "https://symfony.com"
-    },
-    {
-        "name": "phpmyadmin/motranslator",
-        "version": "4.0",
-        "version_normalized": "4.0.0.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/phpmyadmin/motranslator.git",
-            "reference": "fcb370254998fda7eeccfd7c787b4deb71b0d77c"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/phpmyadmin/motranslator/zipball/fcb370254998fda7eeccfd7c787b4deb71b0d77c",
-            "reference": "fcb370254998fda7eeccfd7c787b4deb71b0d77c",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.0",
-            "symfony/expression-language": "^4.0 || ^3.2 || ^2.8"
-        },
-        "require-dev": {
-            "apigen/apigen": "^4.1",
-            "phpunit/php-code-coverage": "*",
-            "phpunit/phpunit": "~4.8 || ~5.7 || ~6.5"
-        },
-        "time": "2018-02-12T13:22:52+00:00",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "PhpMyAdmin\\MoTranslator\\": "src"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "GPL-2.0-or-later"
-        ],
-        "authors": [
-            {
-                "name": "The phpMyAdmin Team",
-                "email": "developers@phpmyadmin.net",
-                "homepage": "https://www.phpmyadmin.net/team/"
-            }
-        ],
-        "description": "Translation API for PHP using Gettext MO files",
-        "homepage": "https://github.com/phpmyadmin/motranslator",
-        "keywords": [
-            "gettext",
-            "i18n",
-            "mo",
-            "translator"
-        ]
-    },
-    {
         "name": "symfony/polyfill-mbstring",
-        "version": "v1.7.0",
-        "version_normalized": "1.7.0.0",
+        "version": "v1.6.0",
+        "version_normalized": "1.6.0.0",
         "source": {
             "type": "git",
             "url": "https://github.com/symfony/polyfill-mbstring.git",
-            "reference": "78be803ce01e55d3491c1397cf1c64beb9c1b63b"
+            "reference": "2ec8b39c38cb16674bbf3fea2b6ce5bf117e1296"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/78be803ce01e55d3491c1397cf1c64beb9c1b63b",
-            "reference": "78be803ce01e55d3491c1397cf1c64beb9c1b63b",
+            "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/2ec8b39c38cb16674bbf3fea2b6ce5bf117e1296",
+            "reference": "2ec8b39c38cb16674bbf3fea2b6ce5bf117e1296",
             "shasum": ""
         },
         "require": {
@@ -123,11 +20,11 @@
         "suggest": {
             "ext-mbstring": "For best performance"
         },
-        "time": "2018-01-30T19:27:44+00:00",
+        "time": "2017-10-11 12:05:26",
         "type": "library",
         "extra": {
             "branch-alias": {
-                "dev-master": "1.7-dev"
+                "dev-master": "1.6-dev"
             }
         },
         "installation-source": "dist",
@@ -165,17 +62,17 @@
     },
     {
         "name": "phpmyadmin/sql-parser",
-        "version": "v4.2.4",
-        "version_normalized": "4.2.4.0",
+        "version": "v4.2.3",
+        "version_normalized": "4.2.3.0",
         "source": {
             "type": "git",
             "url": "https://github.com/phpmyadmin/sql-parser.git",
-            "reference": "10f4e571ba3903593ea7e2c4ec5304f3c0323a98"
+            "reference": "ab4d910fcfb331c58269afd5cf85281cdab954ce"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/phpmyadmin/sql-parser/zipball/10f4e571ba3903593ea7e2c4ec5304f3c0323a98",
-            "reference": "10f4e571ba3903593ea7e2c4ec5304f3c0323a98",
+            "url": "https://api.github.com/repos/phpmyadmin/sql-parser/zipball/ab4d910fcfb331c58269afd5cf85281cdab954ce",
+            "reference": "ab4d910fcfb331c58269afd5cf85281cdab954ce",
             "shasum": ""
         },
         "require": {
@@ -193,7 +90,7 @@
             "ext-mbstring": "For best performance",
             "phpmyadmin/motranslator": "Translate messages to your favorite locale"
         },
-        "time": "2017-12-06T09:53:26+00:00",
+        "time": "2017-10-10 12:58:08",
         "bin": [
             "bin/highlight-query",
             "bin/lint-query"
@@ -226,6 +123,108 @@
         ]
     },
     {
+        "name": "symfony/expression-language",
+        "version": "v2.8.31",
+        "version_normalized": "2.8.31.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/symfony/expression-language.git",
+            "reference": "bb512953dec1e0b1a1037778b1a6a3431b741db3"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/symfony/expression-language/zipball/bb512953dec1e0b1a1037778b1a6a3431b741db3",
+            "reference": "bb512953dec1e0b1a1037778b1a6a3431b741db3",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.9"
+        },
+        "time": "2017-11-12 16:36:54",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "2.8-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Symfony\\Component\\ExpressionLanguage\\": ""
+            },
+            "exclude-from-classmap": [
+                "/Tests/"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Fabien Potencier",
+                "email": "fabien@symfony.com"
+            },
+            {
+                "name": "Symfony Community",
+                "homepage": "https://symfony.com/contributors"
+            }
+        ],
+        "description": "Symfony ExpressionLanguage Component",
+        "homepage": "https://symfony.com"
+    },
+    {
+        "name": "phpmyadmin/motranslator",
+        "version": "3.3",
+        "version_normalized": "3.3.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/phpmyadmin/motranslator.git",
+            "reference": "877f76827fa69bf27e4ffc28d258e9fba3442d8f"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/phpmyadmin/motranslator/zipball/877f76827fa69bf27e4ffc28d258e9fba3442d8f",
+            "reference": "877f76827fa69bf27e4ffc28d258e9fba3442d8f",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0",
+            "symfony/expression-language": "^3.2 || ^2.8"
+        },
+        "require-dev": {
+            "phpunit/php-code-coverage": "*",
+            "phpunit/phpunit": "~4.8 || ~5.7"
+        },
+        "time": "2017-06-01 11:50:55",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "PhpMyAdmin\\MoTranslator\\": "src"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "GPL-2.0+"
+        ],
+        "authors": [
+            {
+                "name": "The phpMyAdmin Team",
+                "email": "developers@phpmyadmin.net",
+                "homepage": "https://www.phpmyadmin.net/team/"
+            }
+        ],
+        "description": "Translation API for PHP using Gettext MO files",
+        "homepage": "https://github.com/phpmyadmin/motranslator",
+        "keywords": [
+            "gettext",
+            "i18n",
+            "mo",
+            "translator"
+        ]
+    },
+    {
         "name": "phpmyadmin/shapefile",
         "version": "2.1",
         "version_normalized": "2.1.0.0",
@@ -250,7 +249,7 @@
         "suggest": {
             "ext-dbase": "For dbf files parsing"
         },
-        "time": "2017-05-15T08:31:47+00:00",
+        "time": "2017-05-15 08:31:47",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -283,23 +282,23 @@
     },
     {
         "name": "tecnickcom/tcpdf",
-        "version": "6.2.17",
-        "version_normalized": "6.2.17.0",
+        "version": "6.2.13",
+        "version_normalized": "6.2.13.0",
         "source": {
             "type": "git",
             "url": "https://github.com/tecnickcom/TCPDF.git",
-            "reference": "64fc19439863e1b1314487a72a74d9bfd0b55a53"
+            "reference": "95c5938aafe4b20df1454dbddb3e5005c0b26f64"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/tecnickcom/TCPDF/zipball/64fc19439863e1b1314487a72a74d9bfd0b55a53",
-            "reference": "64fc19439863e1b1314487a72a74d9bfd0b55a53",
+            "url": "https://api.github.com/repos/tecnickcom/TCPDF/zipball/95c5938aafe4b20df1454dbddb3e5005c0b26f64",
+            "reference": "95c5938aafe4b20df1454dbddb3e5005c0b26f64",
             "shasum": ""
         },
         "require": {
             "php": ">=5.3.0"
         },
-        "time": "2018-02-24T11:48:20+00:00",
+        "time": "2017-04-26 08:14:48",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -324,13 +323,13 @@
         },
         "notification-url": "https://packagist.org/downloads/",
         "license": [
-            "LGPL-3.0"
+            "LGPLv3"
         ],
         "authors": [
             {
                 "name": "Nicola Asuni",
                 "email": "info@tecnick.com",
-                "role": "lead"
+                "homepage": "http://nicolaasuni.tecnick.com"
             }
         ],
         "description": "TCPDF is a PHP class for generating PDF documents and barcodes.",
@@ -347,17 +346,17 @@
     },
     {
         "name": "phpseclib/phpseclib",
-        "version": "2.0.10",
-        "version_normalized": "2.0.10.0",
+        "version": "2.0.9",
+        "version_normalized": "2.0.9.0",
         "source": {
             "type": "git",
             "url": "https://github.com/phpseclib/phpseclib.git",
-            "reference": "d305b780829ea4252ed9400b3f5937c2c99b51d4"
+            "reference": "c9a3fe35e20eb6eeaca716d6a23cde03f52d1558"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/d305b780829ea4252ed9400b3f5937c2c99b51d4",
-            "reference": "d305b780829ea4252ed9400b3f5937c2c99b51d4",
+            "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/c9a3fe35e20eb6eeaca716d6a23cde03f52d1558",
+            "reference": "c9a3fe35e20eb6eeaca716d6a23cde03f52d1558",
             "shasum": ""
         },
         "require": {
@@ -365,7 +364,7 @@
         },
         "require-dev": {
             "phing/phing": "~2.7",
-            "phpunit/phpunit": "^4.8.35|^5.7|^6.0",
+            "phpunit/phpunit": "~4.0",
             "sami/sami": "~2.0",
             "squizlabs/php_codesniffer": "~2.0"
         },
@@ -375,7 +374,7 @@
             "ext-mcrypt": "Install the Mcrypt extension in order to speed up a few other cryptographic operations.",
             "ext-openssl": "Install the OpenSSL extension in order to speed up a wide variety of cryptographic operations."
         },
-        "time": "2018-02-19T04:29:13+00:00",
+        "time": "2017-11-29 06:38:08",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -460,7 +459,7 @@
         "require-dev": {
             "phpunit/phpunit": "^4.8"
         },
-        "time": "2017-03-09T18:44:34+00:00",
+        "time": "2017-03-09 18:44:34",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -488,27 +487,27 @@
     },
     {
         "name": "symfony/polyfill-util",
-        "version": "v1.7.0",
-        "version_normalized": "1.7.0.0",
+        "version": "v1.6.0",
+        "version_normalized": "1.6.0.0",
         "source": {
             "type": "git",
             "url": "https://github.com/symfony/polyfill-util.git",
-            "reference": "e17c808ec4228026d4f5a8832afa19be85979563"
+            "reference": "6e719200c8e540e0c0effeb31f96bdb344b94176"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/symfony/polyfill-util/zipball/e17c808ec4228026d4f5a8832afa19be85979563",
-            "reference": "e17c808ec4228026d4f5a8832afa19be85979563",
+            "url": "https://api.github.com/repos/symfony/polyfill-util/zipball/6e719200c8e540e0c0effeb31f96bdb344b94176",
+            "reference": "6e719200c8e540e0c0effeb31f96bdb344b94176",
             "shasum": ""
         },
         "require": {
             "php": ">=5.3.3"
         },
-        "time": "2018-01-31T18:08:44+00:00",
+        "time": "2017-10-11 12:05:26",
         "type": "library",
         "extra": {
             "branch-alias": {
-                "dev-master": "1.7-dev"
+                "dev-master": "1.6-dev"
             }
         },
         "installation-source": "dist",
@@ -542,28 +541,28 @@
     },
     {
         "name": "symfony/polyfill-php56",
-        "version": "v1.7.0",
-        "version_normalized": "1.7.0.0",
+        "version": "v1.6.0",
+        "version_normalized": "1.6.0.0",
         "source": {
             "type": "git",
             "url": "https://github.com/symfony/polyfill-php56.git",
-            "reference": "ebc999ce5f14204c5150b9bd15f8f04e621409d8"
+            "reference": "265fc96795492430762c29be291a371494ba3a5b"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/symfony/polyfill-php56/zipball/ebc999ce5f14204c5150b9bd15f8f04e621409d8",
-            "reference": "ebc999ce5f14204c5150b9bd15f8f04e621409d8",
+            "url": "https://api.github.com/repos/symfony/polyfill-php56/zipball/265fc96795492430762c29be291a371494ba3a5b",
+            "reference": "265fc96795492430762c29be291a371494ba3a5b",
             "shasum": ""
         },
         "require": {
             "php": ">=5.3.3",
             "symfony/polyfill-util": "~1.0"
         },
-        "time": "2018-01-30T19:27:44+00:00",
+        "time": "2017-10-11 12:05:26",
         "type": "library",
         "extra": {
             "branch-alias": {
-                "dev-master": "1.7-dev"
+                "dev-master": "1.6-dev"
             }
         },
         "installation-source": "dist",
@@ -622,7 +621,7 @@
         "suggest": {
             "ext-libsodium": "Provides a modern crypto API that can be used to generate random bytes."
         },
-        "time": "2017-09-27T21:40:39+00:00",
+        "time": "2017-09-27 21:40:39",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -670,7 +669,7 @@
             "paragonie/random_compat": "^1.4|^2.0",
             "phpunit/phpunit": "4.*|5.*"
         },
-        "time": "2016-06-13T01:00:24+00:00",
+        "time": "2016-06-13 01:00:24",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -714,17 +713,17 @@
     },
     {
         "name": "pragmarx/google2fa",
-        "version": "v2.0.7",
-        "version_normalized": "2.0.7.0",
+        "version": "v2.0.6",
+        "version_normalized": "2.0.6.0",
         "source": {
             "type": "git",
             "url": "https://github.com/antonioribeiro/google2fa.git",
-            "reference": "5a818bda62fab0c0a79060b06d50d50b5525d631"
+            "reference": "bc2d654305e4d09254125f8cd390a7fbc4742d46"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/antonioribeiro/google2fa/zipball/5a818bda62fab0c0a79060b06d50d50b5525d631",
-            "reference": "5a818bda62fab0c0a79060b06d50d50b5525d631",
+            "url": "https://api.github.com/repos/antonioribeiro/google2fa/zipball/bc2d654305e4d09254125f8cd390a7fbc4742d46",
+            "reference": "bc2d654305e4d09254125f8cd390a7fbc4742d46",
             "shasum": ""
         },
         "require": {
@@ -735,12 +734,13 @@
         },
         "require-dev": {
             "bacon/bacon-qr-code": "~1.0",
-            "phpunit/phpunit": "~4|~5|~6"
+            "phpspec/phpspec": "~2.1",
+            "phpunit/phpunit": "~4"
         },
         "suggest": {
             "bacon/bacon-qr-code": "Required to generate inline QR Codes."
         },
-        "time": "2018-01-06T16:21:07+00:00",
+        "time": "2017-09-12 06:55:05",
         "type": "library",
         "extra": {
             "component": "package",
@@ -751,8 +751,7 @@
         "installation-source": "dist",
         "autoload": {
             "psr-4": {
-                "PragmaRX\\Google2FA\\": "src/",
-                "PragmaRX\\Google2FA\\Tests\\": "tests/"
+                "PragmaRX\\Google2FA\\": "src/"
             }
         },
         "notification-url": "https://packagist.org/downloads/",
@@ -800,7 +799,7 @@
         "suggest": {
             "ext-gd": "to generate QR code images"
         },
-        "time": "2017-10-17T09:59:25+00:00",
+        "time": "2017-10-17 09:59:25",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -841,7 +840,7 @@
         "require": {
             "ext-openssl": "*"
         },
-        "time": "2016-12-14T11:52:47+00:00",
+        "time": "2016-12-14 11:52:47",
         "type": "library",
         "installation-source": "dist",
         "autoload": {

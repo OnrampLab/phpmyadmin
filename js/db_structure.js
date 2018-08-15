@@ -328,7 +328,8 @@ AJAX.registerOnload('db_structure.js', function () {
 
             PMA_ajaxShowMessage(PMA_messages.strProcessingRequest);
 
-            var params = getJSConfirmCommonParam(this, $this_anchor.getPostData());
+            var params = getJSConfirmCommonParam(this);
+            params.token = PMA_commonParams.get('token');
 
             $.post(url, params, function (data) {
                 if (typeof data !== 'undefined' && data.success === true) {
@@ -391,7 +392,8 @@ AJAX.registerOnload('db_structure.js', function () {
 
             var $msg = PMA_ajaxShowMessage(PMA_messages.strProcessingRequest);
 
-            var params = getJSConfirmCommonParam(this, $this_anchor.getPostData());
+            var params = getJSConfirmCommonParam(this);
+            params.token = PMA_commonParams.get('token');
 
             $.post(url, params, function (data) {
                 if (typeof data !== 'undefined' && data.success === true) {

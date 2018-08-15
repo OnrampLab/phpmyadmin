@@ -13,7 +13,6 @@ return array(
     'Symfony\\Component\\ExpressionLanguage\\' => array($vendorDir . '/symfony/expression-language'),
     'Samyoul\\U2F\\U2FServer\\' => array($vendorDir . '/samyoul/u2f-php-server/src'),
     'ReCaptcha\\' => array($vendorDir . '/google/recaptcha/src/ReCaptcha'),
-    'PragmaRX\\Google2FA\\Tests\\' => array($vendorDir . '/pragmarx/google2fa/tests'),
     'PragmaRX\\Google2FA\\' => array($vendorDir . '/pragmarx/google2fa/src'),
     'PhpMyAdmin\\SqlParser\\' => array($vendorDir . '/phpmyadmin/sql-parser/src'),
     'PhpMyAdmin\\ShapeFile\\' => array($vendorDir . '/phpmyadmin/shapefile/src'),

@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitd32f002ef796223f70863cf686620a9d
+class ComposerStaticInit102f20e61ccf2c21c496103ebe25665b
 {
     public static $files = array (
         '5255c38a0faeba867671b61dfda6d864' => __DIR__ . '/..' . '/paragonie/random_compat/lib/random.php',
@@ -32,7 +32,6 @@ class ComposerStaticInitd32f002ef796223f70863cf686620a9d
         ),
         'P' => 
         array (
-            'PragmaRX\\Google2FA\\Tests\\' => 25,
             'PragmaRX\\Google2FA\\' => 19,
             'PhpMyAdmin\\SqlParser\\' => 21,
             'PhpMyAdmin\\ShapeFile\\' => 21,
@@ -70,10 +69,6 @@ class ComposerStaticInitd32f002ef796223f70863cf686620a9d
         'ReCaptcha\\' => 
         array (
             0 => __DIR__ . '/..' . '/google/recaptcha/src/ReCaptcha',
-        ),
-        'PragmaRX\\Google2FA\\Tests\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/pragmarx/google2fa/tests',
         ),
         'PragmaRX\\Google2FA\\' => 
         array (
@@ -131,10 +126,10 @@ class ComposerStaticInitd32f002ef796223f70863cf686620a9d
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitd32f002ef796223f70863cf686620a9d::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitd32f002ef796223f70863cf686620a9d::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInitd32f002ef796223f70863cf686620a9d::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInitd32f002ef796223f70863cf686620a9d::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit102f20e61ccf2c21c496103ebe25665b::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit102f20e61ccf2c21c496103ebe25665b::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit102f20e61ccf2c21c496103ebe25665b::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInit102f20e61ccf2c21c496103ebe25665b::$classMap;
 
         }, null, ClassLoader::class);
     }

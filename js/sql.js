@@ -168,19 +168,23 @@ AJAX.registerOnload('sql.js', function () {
         var $link = $(this);
         $link.PMA_confirm(question, $link.attr('href'), function (url) {
             $msgbox = PMA_ajaxShowMessage();
-            var params = 'ajax_request=1&is_js_confirmed=1';
-            var postData = $link.getPostData();
-            if (postData) {
-                params += '&' + postData;
+            if ($link.hasClass('formLinkSubmit')) {
+                submitFormLink($link);
+            } else {
+                var params = {
+                    'ajax_request': true,
+                    'is_js_confirmed': true,
+                    'token': PMA_commonParams.get('token')
+                };
+                $.post(url, params, function (data) {
+                    if (data.success) {
+                        PMA_ajaxShowMessage(data.message);
+                        $link.closest('tr').remove();
+                    } else {
+                        PMA_ajaxShowMessage(data.error, false);
+                    }
+                });
             }
-            $.post(url, params, function (data) {
-                if (data.success) {
-                    PMA_ajaxShowMessage(data.message);
-                    $link.closest('tr').remove();
-                } else {
-                    PMA_ajaxShowMessage(data.error, false);
-                }
-            });
         });
     });
 
