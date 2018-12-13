@@ -2,6 +2,7 @@
 
 $cfg['blowfish_secret'] = '';
 $cfg['ThemeDefault']    = 'original';
+$cfg['ForceSSL']        = false;
 
 // Servers configuration
 $i = 0;
