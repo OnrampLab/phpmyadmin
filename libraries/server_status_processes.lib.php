@@ -29,7 +29,7 @@ function PMA_getHtmlForProcessListAutoRefresh()
     $retval .= '<label>' . __('Refresh rate') . ': ';
     $retval .= ServerStatusData::getHtmlForRefreshList(
         'refreshRate',
-        5,
+        60,
         Array(2, 3, 4, 5, 10, 20, 40, 60, 120, 300, 600, 1200)
     );
     $retval .= '</label>';
@@ -37,6 +37,24 @@ function PMA_getHtmlForProcessListAutoRefresh()
     $retval .= Util::getImage('play.png') . __('Start auto refresh');
     $retval .= '</a>';
     $retval .= '</div>';
+
+    $retval .= <<<"EOD"
+
+<div style="color:red">
+    (modify-code: 自動更新)
+</div>
+
+<script>
+document.onreadystatechange = () => {
+  if (document.readyState === 'complete') {
+    // 文件載入
+    el=document.getElementById('toggleRefresh');
+    el.click();
+  }
+};
+</script>
+
+EOD;
     return $retval;
 }
 
