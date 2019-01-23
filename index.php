@@ -287,6 +287,8 @@ if ($server > 0) {
 echo '</div>';
 
 
+include '_self_/page/index_list.php';
+
 echo '</div>';
 echo '<div id="main_pane_right">';
 
