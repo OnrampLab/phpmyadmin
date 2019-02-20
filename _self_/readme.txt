@@ -50,4 +50,6 @@ ubuntu bash on windows (WSL)
     或 出現 HTTP ERROR 500
     可以査看 error log
         tail -f /var/log/apache2/error.log
+        tail -f /var/log/nginx/error.log (??)
+        tail -f /var/log/nginx/default.error.log
 
